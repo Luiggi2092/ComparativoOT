@@ -1,0 +1,35 @@
+/* Estilo del modal */
+.modal {
+  display: none; /* Por defecto oculto */
+  position: fixed; /* Posición fija para cubrir toda la pantalla */
+  z-index: 1; /* Por encima de otros elementos */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+}
+
+/* Contenido del modal */
+.modal-contenido {
+  background-color: #fefefe; /* Fondo blanco */
+  margin: 15% auto; /* Centrar verticalmente */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Ancho del modal */
+}
+
+/* Estilo del botón para cerrar el modal */
+.cerrar-modal {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.cerrar-modal:hover,
+.cerrar-modal:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}

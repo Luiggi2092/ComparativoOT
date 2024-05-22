@@ -1,0 +1,36 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    color: rgb(6, 6, 6);
+    padding-top: 10px;
+    margin-bottom: 50px;
+  
+    
+  }
+
+
+.thM {
+    padding: 8px;
+    border: 1px solid #847d7d48;
+    font-size: 16px;
+    }
+
+.tablerow-header {
+        background-color: #007bff;
+        color: rgb(6, 6, 6);
+   }
+      
+
+
+tbody {
+    border-top: 2px solid #000; /* Línea horizontal en la parte superior del tbody */
+    border-bottom: 2px solid #000; /* Línea horizontal en la parte inferior del tbody */
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
