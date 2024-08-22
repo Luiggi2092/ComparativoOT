@@ -221,8 +221,10 @@ const Real : React.FC<AudioProps> = ({}) =>{
     </div>
     <div style={{display:'flex',gap:'5px'}}>
     <input placeholder='Ingrese OT' onChange={handleInputChange} style={{height:'3rem'}} />
+    <div style={{height:'3rem'}}>
     <button onClick={handleSearch} style={{backgroundColor:'blue',color:'white'}}><IoSearch style={{marginRight:'8px'}}></IoSearch>Buscar</button>
     <button disabled={data.length === 0 } onClick={handleDownloadPDF}  ><IoPrintSharp style={{marginRight:'8px'}}></IoPrintSharp>Imprimir</button> 
+    </div>
     </div>
     </div>
    { loading && <><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1' }}>

@@ -166,6 +166,7 @@ const Presupuestado : React.FC<AudioProps> = () => {
         }
 
         const userData = await response.json();
+        console.log(userData);
         setData(userData.Materiales);
         setDataPlan(userData.Planchas)
         setDataTin(userData.Tintas);
@@ -317,17 +318,19 @@ const handleSubmit = async() => {
     <Toaster richColors/>
     {/* // <img src={Logo} style={{display:'flex',position:'absolute',marginTop:'-5px',height:'100px'}}/> */}
     <div style={{padding: '2rem'}}>
-    <div style={{display:'flex',justifyContent:'space-between',gap:20,margin:'35px 0px'}}>
+    <div style={{display:'flex',justifyContent:'space-between',gap:20}}>
    
-     <div> 
+   <div style={{zIndex:'10'}}> 
     { op && <h2> Orden : {op} - PRODUCTO : {producto}</h2>} 
     { op && <span>Moneda: {moneda}</span>}
     {op &&  <h4>Precios sin IGV</h4>}
     </div>
-    <div style={{display:'flex',gap:'15px'}}>
-    <input placeholder='Ingrese OT' onChange={handleInputChange} style={{height:'3rem'}}  />
+    <div style={{display:'flex',gap:'15px',justifyContent:'flex-end'}}>
+    <input placeholder='Ingrese OT' onChange={handleInputChange} style={{height:'3rem'}} />
+    <div style={{height:'3rem'}}>
     <button onClick={handleSearch} style={{backgroundColor:'blue',color:'white',padding: '8px 16px'}}><IoSearch style={{marginRight: '8px'}}></IoSearch>Buscar</button>
     <button onClick={handleSubmit} /*disabled={data.length === 0 }*/ ><RiSave3Fill style={{marginRight:'8px'}}></RiSave3Fill>Guardar</button> 
+    </div>
     </div>
      </div>
      { loading && <><div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1' }}>
