@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import './modalstyle.css';
 import Swal from 'sweetalert2'
+import {supabase} from '../services/fetch'
+
+
 
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
-    codigo?:string;
+    codigo?:bigint;
     item?:string;
     titulo?:string;
     cantidad:number;
     costoReal:number;
+    
   }
 
+  
 const Modal : React.FC<ModalProps> = ({isOpen = false,onClose,codigo,item,titulo,cantidad,costoReal}:ModalProps)=> {
     
   const [newCant,setNewCant] = useState<number>(cantidad);
   const [newCost,setNewCost] = useState<number>(costoReal);
   const [newFact,setNewFact] = useState<string>('');
+
+  console.log(codigo);
+  
 
 
   useEffect(()=>{
@@ -24,6 +32,7 @@ const Modal : React.FC<ModalProps> = ({isOpen = false,onClose,codigo,item,titulo
       setNewCost(costoReal);
       setNewFact('');
   },[codigo])
+
 
 
 
@@ -56,7 +65,7 @@ const Modal : React.FC<ModalProps> = ({isOpen = false,onClose,codigo,item,titulo
 
     try{
 
-     const response = await fetch(`http://localhost:3001/movot/update/${codigo}?cant=${newCant}&pu=${newCost}&fact=${newFact}`,
+     /*const response = await fetch(`http://localhost:3001/movot/update/${codigo}?cant=${newCant}&pu=${newCost}&fact=${newFact}`,
         {
           method: 'PATCH',
           headers:{
@@ -74,8 +83,18 @@ const Modal : React.FC<ModalProps> = ({isOpen = false,onClose,codigo,item,titulo
            icon:'success',
            confirmButtonText:'Ok'});
         onClose();
-      }
-      
+      }*/
+
+       const {error} = await supabase.from('ItMovimientos').update({ImaCan: newCant,ImaPun: newCost}).eq('id',codigo);   
+
+
+       if(!error){
+        Swal.fire({
+          title:`Datos Actualizados correctamente`,
+           icon:'success',
+           confirmButtonText:'Ok'});
+           onClose();
+       }
            
     }catch(error){
     }

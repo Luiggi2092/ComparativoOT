@@ -1,10 +1,10 @@
-import { OtDataReal } from "../components/tableRealOt";
+import {OtReal} from '../types/OtReal'
 
 
  
   
 export interface otDataRealTable {
-    otreal : OtDataReal[]
+    otreal : OtReal[]
 }
 
 export const TablesWithPDF: React.FC<otDataRealTable> = ({otreal}) => {
@@ -17,7 +17,7 @@ export const TablesWithPDF: React.FC<otDataRealTable> = ({otreal}) => {
             <table>
                 <thead>
                     <tr>
-                        {Object.keys(table.MAT).map((key) => (
+                        {Object.keys(table.Concepto).map((key) => (
                             <th key={key}>{key}</th>
                         ))}
                     </tr>
@@ -27,12 +27,12 @@ export const TablesWithPDF: React.FC<otDataRealTable> = ({otreal}) => {
                     {otreal.map((row,rowIndex) => (
                         <tr key={rowIndex}>
                            <td>{row.Orden}</td>
-                           <td>{row.MAT}</td>
-                           <td>{row.CANTPRE}</td>
-                           <td>{row.COSTOUNDPRE}</td>
-                           <td>{row.SubTotalPRE}</td>
-                           <td>{row.CANTREAL}</td>
-                           <td>{row.COSTOUNDREAL}</td>
+                           <td>{row.Concepto}</td>
+                           <td>{row.Cantidad}</td>
+                           <td>{row.PrecioUni}</td>
+                           <td>{row.SubtotalPre}</td>
+                           <td>{row.ImaCan}</td>
+                           <td>{row.ImaPun}</td>
                            <td>{row.SubtotalReal}</td>
                         </tr>
                     ))}

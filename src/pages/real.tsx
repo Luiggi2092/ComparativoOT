@@ -1,16 +1,12 @@
-  import React, { useState } from 'react';
-import { OtDataReal } from "../components/tableRealOt";
+import React, { useState } from 'react';
 import { OtRealtabla } from "../components/tableRealOt";
-import { PlanOtReal } from '../components/tablePlanOtReal';
+import {OtReal} from '../types/OtReal'
 import { PlanOtTableReal } from '../components/tablePlanOtReal';
-import { TinOtReal } from '../components/tableTintasOtReal';
 import { TinOtTableReal } from '../components/tableTintasOtReal';
-import { BarnizOtReal } from '../components/tableBarnizOtReal'; 
 import { BarOtTableReal } from '../components/tableBarnizOtReal';
-import { AcaOtReal } from '../components/tableAcaOtReal';
 import { AcaOtTableReal } from '../components/tableAcaOtReal';
-import { OtDataSer} from '../components/tableSerRealOt';
-import { OtRealSerTable } from '../components/tableSerRealOt';
+/*import { OtDataSer} from '../components/tableSerRealOt';
+import { OtRealSerTable } from '../components/tableSerRealOt';*/
 import { AcaProOtReal } from '../components/tableAcaProRealOt';
 import { AcaProOtTableReal } from '../components/tableAcaProRealOt';
 import { Toaster, toast } from 'sonner';
@@ -19,19 +15,20 @@ import { IoPrintSharp } from "react-icons/io5";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { AudioProps,Audio } from 'react-loader-spinner'
+import {supabase} from '../services/fetch';
 
 
 
 
 const Real : React.FC<AudioProps> = ({}) =>{
    
-    const [data,setData]= useState<OtDataReal[]>([]);
-    const [dataPlan,setDataPlan]= useState<PlanOtReal[]>([]);
-    const [dataTin,setDataTin] = useState<TinOtReal[]>([]);
-    const [dataBar,setDataBar] = useState<BarnizOtReal[]>([]);
-    const [dataAca,setDataAca] = useState<AcaOtReal[]>([]);
+    const [data,setData]= useState<OtReal[]>([]);
+    const [dataPlan,setDataPlan]= useState<OtReal[]>([]);
+    const [dataTin,setDataTin] = useState<OtReal[]>([]);
+    const [dataBar,setDataBar] = useState<OtReal[]>([]);
+    const [dataAca,setDataAca] = useState<OtReal[]>([]);
     const [dataAcaProp,setDataAcaProp] = useState<AcaProOtReal[]>([]);
-    const [dataSer,setDataSer] = useState<OtDataSer[]>([]);
+    //const [dataSer,setDataSer] = useState<OtDataSer[]>([]);
     const [Ot,setOt] = useState<number>(0);
     const [producto,setProducto] = useState<string>('');
     const [op,setOp] = useState<string>('');
@@ -43,6 +40,7 @@ const Real : React.FC<AudioProps> = ({}) =>{
       // Otros estilos según sea necesario
     };*/
 
+    
    
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>)=> {
@@ -69,29 +67,43 @@ const Real : React.FC<AudioProps> = ({}) =>{
             return;
        }
 
-   
+      let { data, error } = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'CODMAT'})
+       if (error) console.error(error)
+       else console.log(data)
 
-            const response  =  await fetch(`http://192.168.18.7:3001/realot/${Ot}`)
-            if(!response.ok){
-            throw new Error('Error al buscar la Orden');
-            }
-    
-           const userData = await response.json();
+       let responsePlan = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'PLANCHAS'})
+       let responseTin = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'TINTA'})
+       let responseBar = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'BARNIZ'})
+       let responseEx = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'Actcod'})
+       let responsePro = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'Amacod'})
+       const responseOt = await supabase.from('Ordt').select().match({OdtCod: Ot});
+       
+       
+
+       if(!responseOt.data){
+        throw new Error('Error a buscar la Orden');
+       }
+
+               
+            
+
+          // console.log(response); 
+           //const userData = await response.json();
 
            
 
            if(Ot > 0){
-            setData(userData.Materiales);
-            setDataPlan(userData.Planchas)
-            setDataTin(userData.Tintas);
-            setDataAca(userData.AcabadosExternos);
-            setProducto(userData.Producto[0].PRODUCTO);
-            setDataBar(userData.Barniz);
-            setDataSer(userData.Servicios);
-            setDataAcaProp(userData.AcabadosPropios)
-            setOp(userData.Producto[0].OT)
-            setMoneda(userData.Producto[0].MONEDA);
-           
+            setData(data);
+            setDataPlan(responsePlan.data);
+            setDataTin(responseTin.data);
+            setDataAca(responseEx.data);  
+            setDataBar(responseBar.data);/*
+            setDataSer(userData.Servicios);*/
+            setDataAcaProp(responsePro.data);/*
+            */
+            setProducto(responseOt.data[0].OdtDescrip);
+            setOp(responseOt.data[0].OdtCod)
+            setMoneda(responseOt.data[0].OdtMon);
            }
         }catch(error){
         }finally{
@@ -154,26 +166,26 @@ const Real : React.FC<AudioProps> = ({}) =>{
                   // Agregar datos
                   dataArray.forEach(item => {
                     if(dataArray == data){
-                      tableData.push([item.MAT, item.Elemento, item.CANTPRE.toString(), item.COSTOUNDPRE.toString(), item.CANTREAL.toString(), item.COSTOUNDREAL.toString()]);
+                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
                     }
                     else if (dataArray == dataPlan){
-                      tableData.push([item.PLANCHAS,item.Elemento,item.CANTPRE.toString(),item.COSTOUNDPRE.toString(),item.CANTREAL.toString(),item.COSTOUNDREAL.toString()]);
+                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
                     }
                     else if (dataArray == dataTin){
-                      tableData.push([item.TINTAS,item.Elemento,item.CANTPRE.toString(),item.COSTOUNDPRE.toString(),item.CANTREAL.toString(),item.COSTOUNDREAL.toString()]);
+                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
                     }
                     else if (dataArray == dataBar){
-                      tableData.push([item.BARNIZ,item.Elemento,item.CANTPRE.toString(),item.COSTOUNDPRE.toString(),item.CANTREAL.toString(),item.COSTOUNDREAL.toString()]);
+                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
                     }
                     else if (dataArray == dataAcaProp){
-                      tableData.push([item.ACABADOMANUAL,item.Elemento,item.CANTPRE.toString(),item.COSTOUNDPRE.toString(),item.CANTREAL.toString(),item.COSTOUNDREAL.toString()]);
+                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
                     }
                     else if (dataArray == dataAca){
-                      tableData.push([item.ACABADOMANUAL,item.Elemento,item.CANTPRE.toString(),item.COSTOUNDPRE.toString(),item.CANTREAL.toString(),item.COSTOUNDREAL.toString()]);
+                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
                     }
-                    else if (dataArray == dataSer){
+                    /*else if (dataArray == dataSer){
                       tableData.push([item.SERVICIO,item.Elemento,item.CANTPRE.toString(),item.COSTOUNPRE.toString(),item.CANTREAL.toString(),item.COSTOUNDREAL.toString()]);
-                    }
+                    }*/
                     });
               }
           };
@@ -190,7 +202,7 @@ const Real : React.FC<AudioProps> = ({}) =>{
           addDataToTable(dataBar,'Barniz');
           addDataToTable(dataAcaProp, 'Acabados Manuales Propios');
           addDataToTable(dataAca, 'Acabados Manuales Externos' );
-          addDataToTable(dataSer,  "Servicios",);
+          //addDataToTable(dataSer,  "Servicios",);
   
           // Dibujar la tabla
           (doc as any).autoTable({
@@ -248,7 +260,7 @@ const Real : React.FC<AudioProps> = ({}) =>{
     <h1>Acabados Manuales Externos</h1>
      <AcaOtTableReal acaot={dataAca} listado={handleSearch} />
      <h1>Servicios</h1>
-     <OtRealSerTable otSer={dataSer} listado={handleSearch} />
+     {/* <OtRealSerTable otSer={''} listado={handleSearch} /> */}
     </div>
     </>
     )

@@ -1,23 +1,10 @@
 import './tablestyle.css';
 import Modal from './Modal';
 import { useState } from 'react';
-
-export interface AcaOtReal {
-    CODIGO:string,
-    Orden: number,
-    ACABADOMANUAL:string,
-    Elemento: string,
-    FACTURA: string,
-    CANTPRE: number,
-    COSTOUNDPRE: number,
-    SubTotalPRE: number,
-    CANTREAL:number,
-    COSTOUNDREAL:number,
-    SubtotalReal:number,
-}
+import {OtReal} from '../types/OtReal'
 
 export interface OtDataAca {
-    acaot: AcaOtReal[];
+    acaot: OtReal[];
     listado :  ()=> void;
 }
 
@@ -25,12 +12,12 @@ export const AcaOtTableReal : React.FC<OtDataAca> = ({acaot,listado}) => {
 
      
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [codigo,setCodigo] = useState('');
+    const [codigo,setCodigo] = useState<bigint>();
     const [item,setItem] = useState('');
     const [cantidad,setCantidad] = useState<number>(0);
     const [costoReal,setCostoReal] = useState<number>(0);
 
-    const handleOpenModal = (cod:string,item:string,cant:number,cost:number) => {
+    const handleOpenModal = (cod:bigint,item:string,cant:number,cost:number) => {
         setCodigo(cod);
         setItem(item);
         setCantidad(cant);
@@ -91,17 +78,17 @@ export const AcaOtTableReal : React.FC<OtDataAca> = ({acaot,listado}) => {
             {acaot.map((aca,index) => (
                 <tr key={index}>
                     <td style={{width:'10%',textAlign: 'center'}}>{aca.Orden}</td>
-                    <td  style={{width:'25%',textAlign: 'center'}}>{aca.ACABADOMANUAL}</td>
+                    <td  style={{width:'25%',textAlign: 'center'}}>{aca.Concepto}</td>
                     <td style={{textAlign: 'center'}}>{aca.Elemento}</td>
                     <td style={{width:'10%',textAlign: 'center'}}>{aca.FACTURA}</td>
-                    <td  style={{textAlign: 'center'}}>{aca.CANTPRE}</td>
-                    <td  style={{textAlign: 'center'}}>{aca.COSTOUNDPRE}</td>
-                    <td  style={{textAlign: 'center'}}>{aca.SubTotalPRE}</td>
-                    <td  style={{textAlign: 'center'}}>{aca.CANTREAL}</td>
-                    <td  style={{textAlign: 'center'}}>{aca.COSTOUNDREAL}</td>
+                    <td  style={{textAlign: 'center'}}>{aca.Cantidad}</td>
+                    <td  style={{textAlign: 'center'}}>{aca.PrecioUni}</td>
+                    <td  style={{textAlign: 'center'}}>{aca.SubtotalPre}</td>
+                    <td  style={{textAlign: 'center'}}>{aca.ImaCan}</td>
+                    <td  style={{textAlign: 'center'}}>{aca.ImaPun}</td>
                     <td  style={{textAlign: 'center'}}>{aca.SubtotalReal}</td>
                     <td style={{textAlign: 'center'}}>
-                    <button onClick={() => handleOpenModal(aca.CODIGO,aca.ACABADOMANUAL,aca.CANTREAL,aca.COSTOUNDREAL)}>Editar</button>
+                    <button onClick={() => handleOpenModal(aca.id,aca.Concepto,aca.ImaCan,aca.ImaPun)}>Editar</button>
                     </td>
 
                 </tr>

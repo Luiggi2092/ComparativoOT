@@ -15,6 +15,8 @@ import { Toaster, toast } from 'sonner';
 import { IoSearch } from "react-icons/io5";
 import { RiSave3Fill } from "react-icons/ri";
 import { AudioProps,Audio } from 'react-loader-spinner'
+import {supabase} from '../services/fetch'
+
 
 interface FormattedDataItem {
     ImaPro: number;
@@ -26,6 +28,8 @@ interface FormattedDataItem {
     ImaPun: number;
     ImaSer: string;
   }
+
+
 
 
 const Presupuestado : React.FC<AudioProps> = () => {
@@ -53,14 +57,14 @@ const Presupuestado : React.FC<AudioProps> = () => {
      const COSTOUND = parseFloat(newCOSTOUND);
      if (!isNaN(COSTOUND)) {
     setData(prevData =>
-       prevData.map((item,index) => (index === id ? { ...item, COSTOUND } : item))
+       prevData.map((item,index) => (index === id ? { ...item, PrecioUni: COSTOUND } : item))
      );
    }
    };
    
    const handleCantidadChange = (id: number, newCantidad: number) => {
      setData(prevData =>
-       prevData.map((item,index) => (index === id ? { ...item, CANTIDAD: newCantidad } : item))
+       prevData.map((item,index) => (index === id ? { ...item, Cantidad: newCantidad } : item))
      );
    };
 
@@ -68,14 +72,14 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const COSTOUND = parseFloat(newCOSTOUND);
     if (!isNaN(COSTOUND)) {
       setDataPlan(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, COSTOUND } : item))
+      prevData.map((item,index) => (index === id ? { ...item, PrecioUni: COSTOUND } : item))
     );
   }
   };
   
   const handleCantidadChangePlan = (id: number, newCantidad: number) => {
     setDataPlan(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, CANTIDAD: newCantidad } : item))
+      prevData.map((item,index) => (index === id ? { ...item, Cantidad: newCantidad } : item))
     );
   };
 
@@ -83,14 +87,14 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const COSTOUND = parseFloat(newCOSTOUND);
     if (!isNaN(COSTOUND)) {
     setDataTin(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, COSTOUND } : item))
+      prevData.map((item,index) => (index === id ? { ...item, PrecioUni: COSTOUND } : item))
     );
   }
   };
   
   const handleCantidadChangeTin = (id: number, newCantidad: number) => {
     setDataTin(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, CANTIDAD: newCantidad } : item))
+      prevData.map((item,index) => (index === id ? { ...item, Cantidad: newCantidad } : item))
     );
   };
 
@@ -98,14 +102,14 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const COSTOUND = parseFloat(newCOSTOUND);
     if (!isNaN(COSTOUND)) {
         setDataAca(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, COSTOUND } : item))
+      prevData.map((item,index) => (index === id ? { ...item, PrecioUni: COSTOUND } : item))
     );
   }
   };
   
   const handleCantidadChangeAcaPro = (id: number, newCantidad: number) => {
     setdataAcaProp(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, CANTIDAD: newCantidad } : item))
+      prevData.map((item,index) => (index === id ? { ...item, Cantidad: newCantidad } : item))
     );
   };
 
@@ -113,14 +117,14 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const COSTOUND = parseFloat(newCOSTOUND);
     if (!isNaN(COSTOUND)) {
         setdataAcaProp(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, COSTOUND } : item))
+      prevData.map((item,index) => (index === id ? { ...item, PrecioUni: COSTOUND } : item))
     );
   }
   };
   
   const handleCantidadChangeAca = (id: number, newCantidad: number) => {
     setDataAca(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, CANTIDAD: newCantidad } : item))
+      prevData.map((item,index) => (index === id ? { ...item, Cantidad: newCantidad } : item))
     );
   };
 
@@ -129,14 +133,14 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const COSTOUND = parseFloat(newCOSTOUND);
     if (!isNaN(COSTOUND)) {
         setDataBar(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, COSTOUND } : item))
+      prevData.map((item,index) => (index === id ? { ...item, PrecioUni: COSTOUND } : item))
     );
   }
   };
   
   const handleCantidadChangeBar = (id: number, newCantidad: number) => {
     setDataBar(prevData =>
-      prevData.map((item,index) => (index === id ? { ...item, CANTIDAD: newCantidad } : item))
+      prevData.map((item,index) => (index === id ? { ...item, Cantidad: newCantidad } : item))
     );
   };
 
@@ -160,22 +164,67 @@ const Presupuestado : React.FC<AudioProps> = () => {
        }
    
 
-        const response  = await fetch(`http://192.168.18.7:3001/matot/${Ot}`)
-        if(!response.ok){
-         throw new Error('Error al buscar la Orden');
-        }
+       const responseMat  = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'CODMAT' });  /*fetch(`http://192.168.18.7:3001/matot/${Ot}`)*/
+       const responsePlan = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'PLANCHAS' });
+       const responseTinta = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'TINTA' });
+       const responseBarniz = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'BARNIZ' });
+       const responseAca = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'Actcod' });
+       const responseAcaProp = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'Amacod' });
+       const responseOt = await supabase.from('Ordt').select().match({OdtCod: Ot});
+       console.log(responseOt);
 
-        const userData = await response.json();
-        console.log(userData);
-        setData(userData.Materiales);
-        setDataPlan(userData.Planchas)
-        setDataTin(userData.Tintas);
-        setDataAca(userData.AcabadosExternos);
-        setdataAcaProp(userData.AcabadosPropios);
-        setDataBar(userData.Barniz);
-        setProducto(userData.Producto[0].PRODUCTO);
-        setOp(userData.Producto[0].OT)
-        setMoneda(userData.Producto[0].MONEDA);
+       if(!responseMat.data){
+         throw new Error('Error al buscar la Orden');
+       }
+
+       if(!responsePlan.data){
+        
+        throw new Error('Error al buscar la Orden');
+       }
+
+       if(!responseTinta.data){
+
+         
+        throw new Error('Error al buscar la Orden');
+       }
+
+
+       if(!responseBarniz.data){
+
+         
+        throw new Error('Error al buscar la Orden');
+       }
+
+
+       if(!responseAca.data){
+
+         
+        throw new Error('Error al buscar la Orden');
+       }
+
+
+       if(!responseAcaProp.data){
+
+         
+        throw new Error('Error al buscar la Orden');
+       }
+
+       if(!responseOt.data){
+        throw new Error('Error a buscar la Orden');
+       }
+
+
+       // const info = await fecthDat(String(Ot),'CODMAT');
+        setData(responseMat.data);
+        setDataPlan(responsePlan.data)
+        setDataTin(responseTinta.data);
+        setDataAca(responseAca.data);
+        setdataAcaProp(responseAcaProp.data);
+        setDataBar(responseBarniz.data);
+        console.log(responseOt.data[0].OdtDescrip);
+        setProducto(responseOt.data[0].OdtDescrip);
+        setOp(responseOt.data[0].OdtCod)
+        setMoneda(responseOt.data[0].OdtMon);
        
     }catch(error){
 
@@ -187,34 +236,35 @@ const Presupuestado : React.FC<AudioProps> = () => {
 const handleSubmit = async() => {
 
 
-      
+           
      
     try{
       if (data || dataPlan) {
+
         let formattedData: FormattedDataItem[] = [];
         
         if (data) {
             formattedData = data.map(mat => ({
-                ImaPro: mat.CODMAT,
-                ImaDes1: mat.MAT,
+                ImaPro: mat.Orden,
+                ImaDes1: mat.Concepto,
                 ImaSel: "S",
                 Imatra: mat.Tipo,
                 Imapro1: mat.TipoDet,
-                ImaCan: mat.CANTIDAD,
-                ImaPun: mat.COSTOUND,
+                ImaCan: mat.Cantidad,
+                ImaPun: mat.PrecioUni,
                 ImaSer: String(Ot)
             }));
         }
     
        if (dataPlan) {
             const formattedDataPlan = dataPlan.map(plan => ({
-                ImaPro: plan.CODPLAN,
-                ImaDes1: plan.PLANCHA,
+                ImaPro: plan.Orden,
+                ImaDes1: plan.Concepto,
                 ImaSel: "S",
                 Imatra: plan.Tipo,
                 Imapro1:plan.TipoDet,
-                ImaCan: plan.CANTIDAD,
-                ImaPun: plan.COSTOUND,
+                ImaCan: plan.Cantidad,
+                ImaPun: plan.PrecioUni,
                 ImaSer: String(Ot)
             }));
 
@@ -224,13 +274,13 @@ const handleSubmit = async() => {
 
         if(dataTin){
             const FormattedDataTin = dataTin.map(tin => ({
-                 ImaPro: tin.CODTIN,
-                 ImaDes1: tin.TINTA,
+                 ImaPro: tin.Orden,
+                 ImaDes1: tin.Concepto,
                  ImaSel: "S",
                  Imatra: tin.Tipo,
                  Imapro1: tin.TipoDet,
-                 ImaCan: tin.CANTIDAD,
-                 ImaPun: tin.COSTOUND,
+                 ImaCan: tin.Cantidad,
+                 ImaPun: tin.PrecioUni,
                  ImaSer: String(Ot)
             }));
 
@@ -240,13 +290,13 @@ const handleSubmit = async() => {
 
         if(dataBar){
           const FormmattedDataBar = dataBar.map(bar => ({
-                 ImaPro: bar.CODBAR,
-                 ImaDes1: bar.BARNIZ,
+                 ImaPro: bar.Orden,
+                 ImaDes1: bar.Concepto,
                  ImaSel: "S",
                  Imatra: bar.Tipo,
                  Imapro1:bar.TipoDet,
-                 ImaCan: bar.CANTIDAD,
-                 ImaPun: bar.COSTOUND,
+                 ImaCan: bar.Cantidad,
+                 ImaPun: bar.PrecioUni,
                  ImaSer: String(Ot)
           }));
 
@@ -255,13 +305,13 @@ const handleSubmit = async() => {
 
         if(dataAca){
            const FormattedDataAca = dataAca.map(aca => ({
-                 ImaPro: aca.CODACA,
-                 ImaDes1: aca.ACABADOMANUAL,
+                 ImaPro: aca.Orden,
+                 ImaDes1: aca.Concepto,
                  ImaSel: "S",
                  Imatra: aca.Tipo,
                  Imapro1: aca.TipoDet,
-                 ImaCan: aca.CANTIDAD,
-                 ImaPun: aca.COSTOUND,
+                 ImaCan: aca.Cantidad,
+                 ImaPun: aca.PrecioUni,
                  ImaSer: String(Ot)
            }))
 
@@ -271,13 +321,13 @@ const handleSubmit = async() => {
 
         if(dataAcaProp){
           const FormattedDataAcaProp = dataAcaProp.map(aca => ({
-                ImaPro: aca.CODACA,
-                ImaDes1: aca.ACABADOMANUAL,
+                ImaPro: aca.Orden,
+                ImaDes1: aca.Concepto,
                 ImaSel: "S",
                 Imatra: aca.Tipo,
                 Imapro1: aca.TipoDet,
-                ImaCan: aca.CANTIDAD,
-                ImaPun: aca.COSTOUND,
+                ImaCan: aca.Cantidad,
+                ImaPun: aca.PrecioUni,
                 ImaSer: String(Ot)
           }))
 
@@ -285,23 +335,31 @@ const handleSubmit = async() => {
           formattedData.push(...FormattedDataAcaProp);
        }
     
+      
+
+       const response2 = await supabase.from('ItMovimientos').select().eq('ImaSer', Ot);
+
+       if(response2.data && response2?.data.length > 0){
+        toast.error('Error la Orden ya existe'); 
+      }else{
         
+       const response =  await supabase.from("ItMovimientos").insert(formattedData);
+       
+       if(!response){
+        return;  
+       }
+
+       
+       toast.success('Datos enviados correctamente');
+      }
+
+       };
+
+      
     
-        const response = await fetch('http://localhost:3001/movot', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formattedData)
-        });
+         
     
-        if (!response.ok) {
-            toast.error('Error la Orden ya existe');
-        } else {
-            toast.success('Datos enviados correctamente');
-        }
-    } else {
-    }
+      
 
      }catch(error){
         
@@ -309,7 +367,7 @@ const handleSubmit = async() => {
  
       setLoading(false);
      }
-
+     
     
  };
 

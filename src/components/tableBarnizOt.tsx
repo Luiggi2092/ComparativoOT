@@ -3,13 +3,13 @@ import './tablestyle.css';
 
 
 export interface BarOt {
-    CODBAR: number,
-    BARNIZ: string,
+    Orden: number,
+    Concepto: string,
     Elemento:string,
     Tipo: string,
     TipoDet: string,
-    CANTIDAD: number,
-    COSTOUND : number
+    Cantidad: number,
+    PrecioUni : number
 
 }
 
@@ -48,11 +48,11 @@ export const BarOtTable : React.FC<OtDataBarOt> = ({barot,onChangeCantidad,onCha
             <tbody style={{border: '1px solid black'}} >
                 {barot.map((bar,index) => (
                     <tr key={index}>
-                        <td style={{width:'10%',textAlign: 'center'}}>{bar.CODBAR}</td>
-                        <td style={{width:'25%',textAlign: 'center'}}>{bar.BARNIZ}</td>
+                        <td style={{width:'10%',textAlign: 'center'}}>{bar.Orden}</td>
+                        <td style={{width:'25%',textAlign: 'center'}}>{bar.Concepto}</td>
                         <td style={{textAlign:'center'}}>{bar.Elemento}</td>
-                        <td style={{textAlign: 'center'}}><input type="number" value={bar.CANTIDAD} onChange={(e) => onChangeCantidad(index,Number(e.target.value))} style={{textAlign: 'center'}}/></td>
-                        <td style={{textAlign: 'center'}}><input type='number' value={bar.COSTOUND} step="0.0001" onChange={(e)=> onChangeCOSTOUND(index,e.target.value)} style={{textAlign: 'center'}}/></td>
+                        <td style={{textAlign: 'center'}}><input type="number" value={bar.Cantidad} onChange={(e) => onChangeCantidad(index,Number(e.target.value))} style={{textAlign: 'center'}}/></td>
+                        <td style={{textAlign: 'center'}}><input type='number' value={bar.PrecioUni} step="0.0001" onChange={(e)=> onChangeCOSTOUND(index,e.target.value)} style={{textAlign: 'center'}}/></td>
                     </tr>
                 ))}
             </tbody>

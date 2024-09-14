@@ -1,13 +1,13 @@
 import './tablestyle.css';
 
 export interface PlanOt {
-    CODPLAN: number,
-    PLANCHA: string,
+    Orden: number,
+    Concepto: string,
     Elemento: string,
     Tipo: string,
     TipoDet: string,
-    CANTIDAD: number,
-    COSTOUND : number
+    Cantidad: number,
+    PrecioUni : number
 
 }
 
@@ -46,11 +46,11 @@ export const PlanOtTable : React.FC<otDataPlan> = ({planot,onChangeCantidad,onCh
             <tbody  className='cuerpo'>
                 {planot.map((pla,index) => (
                     <tr key={index}>
-                         <td style={{width:'10%',textAlign: 'center'}}>{pla.CODPLAN}</td>
-                          <td  style={{width:'25%',textAlign: 'center'}}>{pla.PLANCHA}</td>
+                         <td style={{width:'10%',textAlign: 'center'}}>{pla.Orden}</td>
+                          <td  style={{width:'25%',textAlign: 'center'}}>{pla.Concepto}</td>
                           <td style={{textAlign: 'center'}}>{pla.Elemento}</td>
-                          <td style={{textAlign: 'center'}}><input type="number" value={pla.CANTIDAD} onChange={(e) => onChangeCantidad(index, Number(e.target.value))} style={{textAlign: 'center'}} /></td>
-                          <td style={{textAlign: 'center'}}><input type="number" value={pla.COSTOUND} step="0.0001" onChange={(e) => onChangeCOSTOUND(index, e.target.value)} style={{textAlign: 'center'}}/></td>
+                          <td style={{textAlign: 'center'}}><input type="number" value={pla.Cantidad} onChange={(e) => onChangeCantidad(index, Number(e.target.value))} style={{textAlign: 'center'}} /></td>
+                          <td style={{textAlign: 'center'}}><input type="number" value={pla.PrecioUni} step="0.0001" onChange={(e) => onChangeCOSTOUND(index, e.target.value)} style={{textAlign: 'center'}}/></td>
                     </tr>
                        
                 ))

@@ -1,5 +1,5 @@
 import Logo from '../assets/isograf.jpg'
-import { Link } from 'react-router-dom';
+import { Link,Outlet } from 'react-router-dom';
 
 
 const Header:React.FC = () => {
@@ -17,6 +17,7 @@ const Header:React.FC = () => {
                     <Link to="/real" style={{color:'white'}}>Presupuestado vs Real</Link>
                 </li>
             </ul>
+            <Outlet/>
         </nav>
     </header>
   )

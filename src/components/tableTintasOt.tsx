@@ -2,13 +2,13 @@ import './tablestyle.css';
 
 
 export interface TinOt {
-    CODTIN: number;
-    TINTA: string;
+    Orden: number;
+    Concepto: string;
     Elemento: string;
     Tipo: string,
     TipoDet: string,
-    CANTIDAD: number,
-    COSTOUND : number
+    Cantidad: number,
+    PrecioUni : number
 
 
 }
@@ -47,11 +47,11 @@ export const TinOtTable : React.FC<OtDataTintable> = ({tinot,onChangeCantidad,on
             <tbody  style={{border: '1px solid black'}}>
                 {tinot.map((tin,index) => (
                     <tr key={index}>
-                        <td  style={{width:'10%',textAlign: 'center'}}>{tin.CODTIN}</td>
-                        <td  style={{width:'25%',textAlign: 'center'}}>{tin.TINTA}</td>
+                        <td  style={{width:'10%',textAlign: 'center'}}>{tin.Orden}</td>
+                        <td  style={{width:'25%',textAlign: 'center'}}>{tin.Concepto}</td>
                         <td style={{textAlign: 'center',width:'10%'}}>{tin.Elemento}</td>
-                        <td style={{textAlign: 'center'}}><input type="number" value={tin.CANTIDAD} onChange={(e) => onChangeCantidad(index, Number(e.target.value))} style={{textAlign: 'center'}}/></td>
-                        <td style={{textAlign: 'center'}}><input type="number" value={tin.COSTOUND} step="0.0001" onChange={(e) => onChangeCOSTOUND(index, e.target.value)} style={{textAlign:'center'}}/></td>
+                        <td style={{textAlign: 'center'}}><input type="number" value={tin.Cantidad} onChange={(e) => onChangeCantidad(index, Number(e.target.value))} style={{textAlign: 'center'}}/></td>
+                        <td style={{textAlign: 'center'}}><input type="number" value={tin.PrecioUni} step="0.0001" onChange={(e) => onChangeCOSTOUND(index, e.target.value)} style={{textAlign:'center'}}/></td>
                     </tr>
                 )
 
