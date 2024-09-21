@@ -2,7 +2,8 @@ import './App.css'
 import Header from './components/Header';
 import Real from './pages/real';
 import Presupuestado from './pages/presupuestado';
-import { Routes, Route } from 'react-router-dom';
+import Login from './pages/Login/Login';
+import { Routes, Route,useLocation} from 'react-router-dom';
 
 
 
@@ -10,14 +11,15 @@ import { Routes, Route } from 'react-router-dom';
 
 const App: React.FC = () => {
   
-  
+  const location = useLocation();
 
 
   return (
      <div>
-     <Header/>
+      {location.pathname !== "/" && <Header/>}
      <Routes>
-     <Route  path='/'  element={<Presupuestado/>}/>
+     <Route path='/' element={<Login/>}/>
+     <Route path='/pre'  element={<Presupuestado/>}/>
      <Route path="/real" element={<Real/>} />
      </Routes>
     </div> 
