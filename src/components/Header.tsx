@@ -29,7 +29,7 @@ const Header:React.FC = () => {
                 </Link>
                 </li>
                 {isDropdownOpen && (
-            <ul style={{position:'absolute',top:'100%',right:0,backgroundColor:'white',color:'black',borderRadius:'5px',padding:'10px',boxShadow:'0 8px 16px rgba(0, 0, 0, 0.2)',listStyle:'none',margin:0,minWidth:150}}>
+            <ul style={{position:'absolute',top:'100%',right:0,backgroundColor:'white',color:'black',borderRadius:'5px',padding:'10px',boxShadow:'0 8px 16px rgba(0, 0, 0, 0.2)',listStyle:'none',margin:0,minWidth:150,zIndex:1}}>
               <li style={{margin:0}}>
                 <Link to="/">Vendedores</Link>
               </li>
