@@ -6,21 +6,14 @@ import { UsersService } from '../../services/UsuariosServices/UsuarioService';
 import { VistaService} from '../../services/VistasServices/VistasService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { FileUpload } from 'primereact/fileupload';
-import { Rating } from 'primereact/rating';
 import { Toolbar } from 'primereact/toolbar';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
-import { RadioButton } from 'primereact/radiobutton';
-import { InputNumber,InputNumberChangeEvent } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
 import './Usuarios.css';
 import { Checkbox } from 'primereact/checkbox';
-import { FcIntegratedWebcam } from 'react-icons/fc';
-        
 
 
 const Usuarios: React.FC = () => {
@@ -74,7 +67,7 @@ const Usuarios: React.FC = () => {
     const [globalFilter, setGlobalFilter] = useState<string | null>(null);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
-    const [selectedCategories, setSelectedCategories] = useState<Vista[]>(Vistas && Vistas.length > 1 ? [Vistas[1]] : []);
+    const [selectedCategories] = useState<Vista[]>(Vistas && Vistas.length > 1 ? [Vistas[1]] : []);
    
      
 
