@@ -6,17 +6,20 @@ import { UsersService } from '../../services/UsuariosServices/UsuarioService';
 import { VistaService} from '../../services/VistasServices/VistasService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
+import { RadioButton } from 'primereact/radiobutton';
 import { Toolbar } from 'primereact/toolbar';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { Password } from 'primereact/password';
 import { Tag } from 'primereact/tag';
 import './Usuarios.css';
 import { Checkbox } from 'primereact/checkbox';
 import { FileUpload } from 'primereact/fileupload';
 import axios from "axios"
 const url = 'https://api.cloudinary.com/v1_1/dpq8kiocc/image/upload'
+import {supabase} from '../../services/fetch';
 
 
 
@@ -24,12 +27,10 @@ const url = 'https://api.cloudinary.com/v1_1/dpq8kiocc/image/upload'
 const Usuarios: React.FC = () => {
 
     interface Product {
-        id: string | null;
-        created_at: string; 
         nombre:string;
         Login:string;
+        Password:string;
         image: string | null;
-        rol: string | null;
         Estado: boolean;
         chkpreAcaEx: boolean;
         chkpreAcaPro: boolean;
@@ -47,12 +48,10 @@ const Usuarios: React.FC = () => {
     }
 
     let emptyProduct:Product = {
-        id: null,
-        created_at: '',
         nombre:'',
         Login:'',
+        Password:'',
         image: '',
-        rol: null,
         Estado: true,
         chkpreAcaEx: false,
         chkpreAcaPro: false,
@@ -113,21 +112,30 @@ const Usuarios: React.FC = () => {
         setDeleteProductsDialog(false);
     };
 
-    const saveProduct = () => {
+    const saveProduct = async() => {
         setSubmitted(true);
 
-        if (product.nombre.trim()) {
+        if (Form.nombre.trim()) {
             let _products = [...(products || [])];
             let _product = { ...product };
+            console.log("holitas")
+            if (product.nombre) {
+                //const index = findIndexById(product.id);
 
-            if (product.id) {
-                const index = findIndexById(product.id);
-
-                _products[index] = _product;
+               // _products[index] = _product;
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
             } else {
-                _product.id = createId();
-                _product.image = 'product-placeholder.svg';
+
+                const response =  await supabase.from("Usuarios").insert(Form);
+                 
+
+                console.log(response);
+
+
+               // _product.id = createId();
+                _product.image = Form.image;
+                _product.Login = Form.Login;
+                _product.nombre = Form.nombre;
                 _products.push(_product);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
             }
@@ -149,15 +157,15 @@ const Usuarios: React.FC = () => {
     };
 
     const deleteProduct = () => {
-        let _products = (products|| []).filter((val) => val.id !== product.id);
-        setProducts(_products);
+       // let _products = (products|| []).filter((val) => val.id !== product.id);
+       // setProducts(_products);
         setDeleteProductDialog(false);
         setProduct(emptyProduct);
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     };
 
-    const findIndexById = (id: string | null): number => {
-        let index = -1;
+   /* const findIndexById = (id: string | null): number => {
+        /*let index = -1;
         if (id !== null && products) {
             for (let i = 0; i < products.length; i++) {
                 if (products[i].id === id) {
@@ -167,8 +175,8 @@ const Usuarios: React.FC = () => {
             }
         }
         return index;
-    };
-    const createId = () => {
+    };*/
+    /*const createId = () => {
         let id = '';
         let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -177,7 +185,7 @@ const Usuarios: React.FC = () => {
         }
 
         return id;
-    };
+    };*/
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -216,13 +224,16 @@ const Usuarios: React.FC = () => {
 
         };
 
-    const onInputChange = <T extends keyof Product>(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: T) => {
-        const val = e.target.value as Product[T]; // Aquí estamos haciendo coincidir el tipo de valor con el tipo del campo en Product
-        let _product = { ...product };
+    const onInputChange = (e:any) => {
+        //const val = e.target.value as Product[T]; // Aquí estamos haciendo coincidir el tipo de valor con el tipo del campo en Product
+        //const  value = e.target.checked;
+        const  property = e.target.name;
+        const  value = e.target.value;
+        console.log(e);       
+        console.log(value);
+        console.log(property);
     
-        _product[name] = val;
-    
-        setProduct(_product);
+        setForm({...Form,[property]:value});
     };
 
     
@@ -274,7 +285,11 @@ const Usuarios: React.FC = () => {
             
         });
 
-        setForm({ ...Form, image: res.data.secure_url })
+        setForm({ ...Form,image: res.data.secure_url })
+        toast.current?.show({ severity: 'success', summary: 'Image uploaded', detail: 'Image uploaded successfully', life: 3000 });
+
+        // Limpia los archivos y cambia el estado a "complete"
+        e.options.clear();
 
     };
 
@@ -298,6 +313,12 @@ const Usuarios: React.FC = () => {
 
 
         
+    };
+
+    const onCategoryChange1 = (e:any) => {
+        let _product = { ...Form };
+        _product['Estado'] = e.value === 'Activo';
+        setForm(_product);
     };
 
     const header = (
@@ -351,7 +372,7 @@ const Usuarios: React.FC = () => {
             <Dialog visible={productDialog} style={{ width: '33rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Datos Usuario" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 {Form.image && <img src={Form.image} alt={Form.image} height={150} className="product-image block m-auto pb-3" />}
                 <div className="field">
-        <label htmlFor="image" className="font-bold">Upload Image</label>
+        <label htmlFor="image" className="font-bold">Carga Imagen</label>
         <FileUpload
             name="image"
             accept="image/*"
@@ -359,14 +380,41 @@ const Usuarios: React.FC = () => {
             customUpload
             uploadHandler={(e) => onImageUpload(e)}
             emptyTemplate={
-                <p className="m-0">Drag and drop files to here to upload.</p>}
+                <p className="m-0">Arrastre y suelte archivos aquí para cargarlos..</p>}
         /></div>
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
-                        Name
+                        Usuario
                     </label>
-                    <InputText id="name" value={product.nombre} onChange={(e) => onInputChange(e, 'nombre')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.nombre })} />
-                    {submitted && !product.nombre && <small className="p-error">Name is required.</small>}
+                    <InputText name="nombre" value={Form.Login} onChange={(e) => setForm({...Form,Login:e.target.value})} required autoFocus className={classNames({ 'p-invalid': submitted && !Form.nombre })} />
+                    {submitted && !Form.Login && <small className="p-error">Name is required.</small>}
+                </div>
+                <div className="field">
+                    <label htmlFor="name" className="font-bold">
+                        Password
+                    </label>
+                    <Password value={Form.Password} onChange={(e) => setForm({...Form,Password:e.target.value})} toggleMask />
+                    {submitted && !Form.Password && <small className="p-error">Password is required.</small>}
+                </div>
+                <div className="field">
+                    <label htmlFor="name" className="font-bold">
+                        Nombre
+                    </label>
+                    <InputText name="nombre" value={Form.nombre} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !Form.nombre })} />
+                    {submitted && !Form.nombre && <small className="p-error">Name is required.</small>}
+                </div>
+                <div className="field">
+                    <label className="mb-3 font-bold">Estado</label>
+                    <div className="formgrid grid">
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="Estado" name="Estado" value="Activo" onChange={onCategoryChange1} checked={Form.Estado === true} />
+                            <label htmlFor="category1">Activo</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="Estado" name="Estado" value="No Activo" onChange={onCategoryChange1} checked={Form.Estado === false} />
+                            <label htmlFor="category2">No Activo</label>
+                        </div>
+                </div>
                 </div>
                
                 <div className="field">
