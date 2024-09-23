@@ -14,6 +14,11 @@ import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
 import './Usuarios.css';
 import { Checkbox } from 'primereact/checkbox';
+import { FileUpload } from 'primereact/fileupload';
+import axios from "axios"
+const url = 'https://api.cloudinary.com/v1_1/dpq8kiocc/image/upload'
+
+
 
 
 const Usuarios: React.FC = () => {
@@ -23,7 +28,7 @@ const Usuarios: React.FC = () => {
         created_at: string; 
         nombre:string;
         Login:string;
-        image?: string | null;
+        image: string | null;
         rol: string | null;
         Estado: boolean;
         chkpreAcaEx: boolean;
@@ -46,7 +51,7 @@ const Usuarios: React.FC = () => {
         created_at: '',
         nombre:'',
         Login:'',
-        image: null,
+        image: '',
         rol: null,
         Estado: true,
         chkpreAcaEx: false,
@@ -56,6 +61,8 @@ const Usuarios: React.FC = () => {
         chkprePlan:false,
         chkpreTin:false,
     };
+
+
     const [products, setProducts] = useState<Product[]>([]);
     const [Vistas,setVistas] = useState<Vista[]>([]);
     const [productDialog, setProductDialog] = useState(false);
@@ -68,14 +75,21 @@ const Usuarios: React.FC = () => {
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [selectedCategories] = useState<Vista[]>(Vistas && Vistas.length > 1 ? [Vistas[1]] : []);
-   
+    const [Form,setForm]=useState(emptyProduct)
      
 
     useEffect(() => {
        UsersService.getProductsData().then((data:any) => setProducts(data));
        VistaService.getVistas().then((data:any) => setVistas(data));
+    
        
     }, []);
+
+
+    useEffect(() => {
+        setForm({ ...Form, ...product });
+    }, [product]);
+
 
 
 
@@ -187,13 +201,20 @@ const Usuarios: React.FC = () => {
     };
     
 
-    const onCategoryChange = (e:any) => {
-        if(e.checked){
-            console.log(true);
-        }else{
-            console.log(false);
-        }
-    };
+        const onCategoryChange = (e:any) => {
+        
+        
+            const  property = e.target.name;
+            const  value = e.target.checked;
+            console.log(property);
+            console.log(value);
+        
+                setForm({
+                    ...Form,
+                    [property]: value
+                })
+
+        };
 
     const onInputChange = <T extends keyof Product>(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: T) => {
         const val = e.target.value as Product[T]; // Aquí estamos haciendo coincidir el tipo de valor con el tipo del campo en Product
@@ -234,6 +255,27 @@ const Usuarios: React.FC = () => {
 
     const statusBodyTemplate = (rowData:Product) => {
         return <Tag value={rowData.Estado ? 'Activo':'No Activo'} severity={getSeverity(rowData)}></Tag>;
+    };
+
+    const onImageUpload = async (e:any) => {
+        
+        // Lógica para manejar la imagen, como subirla a un servidor
+        // Por ahora, asumimos que el nombre del archivo es suficiente
+        const file = e.files[0];
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'Products');
+
+        const res = await axios.post(url, formData, {
+            headers: {
+                'Content-Type': 'multipart/formData'
+            },
+            
+        });
+
+        setForm({ ...Form, image: res.data.secure_url })
+
     };
 
     const actionBodyTemplate = (rowData:Product) => {
@@ -306,8 +348,20 @@ const Usuarios: React.FC = () => {
                 </DataTable>
             </div>
 
-            <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
-                {product.image && <img src={product.image} alt={product.image} className="product-image block m-auto pb-3" />}
+            <Dialog visible={productDialog} style={{ width: '33rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Datos Usuario" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+                {Form.image && <img src={Form.image} alt={Form.image} height={150} className="product-image block m-auto pb-3" />}
+                <div className="field">
+        <label htmlFor="image" className="font-bold">Upload Image</label>
+        <FileUpload
+            name="image"
+            accept="image/*"
+            maxFileSize={1000000}
+            customUpload
+            uploadHandler={(e) => onImageUpload(e)}
+            aria-hidden="true"
+            emptyTemplate={
+                <p className="m-0">Drag and drop files to here to upload.</p>}
+        /></div>
                 <div className="field">
                     <label htmlFor="name" className="font-bold">
                         Name
@@ -318,29 +372,29 @@ const Usuarios: React.FC = () => {
                
                 <div className="field">
                     <label className="mb-3 font-bold">Vista Presupuestado</label>
-                    <div className="formgrid grid">
-                    <div className="field-radiobutton col-6">
-                            <Checkbox inputId="category1" name="category" value={product.chkpreMat} onChange={onCategoryChange} checked={product.chkpreMat} />
+                    <div className="formgrid grid"> 
+                        <div className="field-radiobutton col-6">
+                                <Checkbox inputId="category1" name="chkpreMat"  onChange={onCategoryChange} checked={Form.chkpreMat} />
                             <label htmlFor="category1">Materiales</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <Checkbox inputId="category2" name="category" value={product.chkprePlan} onChange={onCategoryChange} checked={product.chkprePlan} />
+                            <Checkbox inputId="category2" name="chkprePlan"  onChange={onCategoryChange} checked={Form.chkprePlan} />
                             <label htmlFor="category2">Planchas</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <Checkbox inputId="category3" name="category" value={product.chkpreTin} onChange={onCategoryChange} checked={product.chkpreTin} />
+                            <Checkbox inputId="category3" name="chkpreTin" onChange={onCategoryChange} checked={Form.chkpreTin} />
                             <label htmlFor="category3">Tintas</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <Checkbox inputId="category4" name="category" value={product.chkpreBar} onChange={onCategoryChange} checked={product.chkpreBar} />
+                            <Checkbox inputId="category4" name="chkpreBar"  onChange={onCategoryChange} checked={Form.chkpreBar} />
                             <label htmlFor="category4">Barniz</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                        <Checkbox inputId="category5" name="category" value={product.chkpreAcaPro} onChange={onCategoryChange} checked={product.chkpreAcaPro} />
+                        <Checkbox inputId="category5" name="chkpreAcaPro"  onChange={onCategoryChange} checked={Form.chkpreAcaPro} />
                         <label htmlFor="category5">Acabados Propios</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                        <Checkbox inputId="category6" name="category" value={product.chkpreAcaEx} onChange={onCategoryChange} checked={product.chkpreAcaEx} />
+                        <Checkbox inputId="category6" name="chkpreAcaEx"  onChange={onCategoryChange} checked={Form.chkpreAcaEx} />
                         <label htmlFor="category6">Acabados Externos</label>
                         </div>
                     </div>
