@@ -358,7 +358,6 @@ const Usuarios: React.FC = () => {
             maxFileSize={1000000}
             customUpload
             uploadHandler={(e) => onImageUpload(e)}
-            aria-hidden="true"
             emptyTemplate={
                 <p className="m-0">Drag and drop files to here to upload.</p>}
         /></div>
