@@ -3,7 +3,6 @@ import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { UsersService } from '../../services/UsuariosServices/UsuarioService';
-import { VistaService} from '../../services/VistasServices/VistasService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
@@ -20,13 +19,14 @@ import { FileUpload } from 'primereact/fileupload';
 import axios from "axios"
 const url = 'https://api.cloudinary.com/v1_1/dpq8kiocc/image/upload'
 import {supabase} from '../../services/fetch';
-
+import { useUserStore} from '../../store/UserStore'
 
 
 
 const Usuarios: React.FC = () => {
 
     interface Product {
+        id:number
         nombre:string;
         Login:string;
         Password:string;
@@ -38,16 +38,20 @@ const Usuarios: React.FC = () => {
         chkpreMat:boolean;
         chkprePlan:boolean;
         chkpreTin:boolean;
+        chkreMat:boolean;
+        chkrePlan:boolean;
+        chkreTin:boolean;
+        chkreBar:boolean;
+        chkreAcaEx:boolean;
+        chkreAcaPro:boolean;
+        VUsers:boolean;
+        VVendedores:boolean;
     }
 
-    interface Vista {
-        id: number;
-        created_at: string; 
-        vista:string;
-
-    }
+   
 
     let emptyProduct:Product = {
+        id:0,
         nombre:'',
         Login:'',
         Password:'',
@@ -59,11 +63,18 @@ const Usuarios: React.FC = () => {
         chkpreMat:false,
         chkprePlan:false,
         chkpreTin:false,
+        chkreMat:false,
+        chkrePlan:false,
+        chkreTin:false,
+        chkreBar:false,
+        chkreAcaEx:false,
+        chkreAcaPro:false,
+        VUsers:false,
+        VVendedores:false
     };
 
 
     const [products, setProducts] = useState<Product[]>([]);
-    const [Vistas,setVistas] = useState<Vista[]>([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
@@ -73,14 +84,13 @@ const Usuarios: React.FC = () => {
     const [globalFilter, setGlobalFilter] = useState<string | null>(null);
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
-    const [selectedCategories] = useState<Vista[]>(Vistas && Vistas.length > 1 ? [Vistas[1]] : []);
     const [Form,setForm]=useState(emptyProduct)
+    const {getUser} = useUserStore();
      
 
     useEffect(() => {
        UsersService.getProductsData().then((data:any) => setProducts(data));
-       VistaService.getVistas().then((data:any) => setVistas(data));
-    
+       
        
     }, []);
 
@@ -119,17 +129,77 @@ const Usuarios: React.FC = () => {
             let _products = [...(products || [])];
             let _product = { ...product };
             console.log("holitas")
-            if (product.nombre) {
-                //const index = findIndexById(product.id);
+            if (product.id > 0) {
+                const index = findIndexById(product.id);
 
-               // _products[index] = _product;
+
+                const {error} = await supabase.from('Usuarios').update(
+                    {Login: Form.Login,
+                     nombre: Form.nombre,
+                     image:Form.image,
+                     chkpreMat:Form.chkpreMat,
+                     chkprePlan:Form.chkprePlan,
+                     chkpreTin:Form.chkpreTin,
+                     chkpreBar:Form.chkpreBar,
+                     chkpreAcaEx:Form.chkpreAcaEx,
+                     chkpreAcaPro:Form.chkpreAcaPro,
+                     Password:Form.Password,
+                     chkreMat:Form.chkreMat,
+                     chkrePlan:Form.chkrePlan,
+                     chkreTin:Form.chkreTin,
+                     chkreBar:Form.chkreBar,
+                     chkreAcaEx:Form.chkreAcaEx,
+                     chkreAcaPro:Form.chkreAcaPro,
+                     VUsers: Form.VUsers,
+                     VVendedores:Form.VVendedores,
+                     Estado:Form.Estado
+                     }).eq('id',Form.id);
+
+
+
+                if(!error){
+
+                    _product = {
+                        ..._product,
+                        Login: Form.Login,
+                        nombre: Form.nombre,
+                        image: Form.image,
+                        chkpreMat: Form.chkpreMat,
+                        chkprePlan: Form.chkprePlan,
+                        chkpreTin: Form.chkpreTin,
+                        chkpreBar: Form.chkpreBar,
+                        chkpreAcaEx: Form.chkpreAcaEx,
+                        chkpreAcaPro: Form.chkpreAcaPro,
+                        Password: Form.Password,
+                        chkreMat: Form.chkreMat,
+                        chkrePlan: Form.chkrePlan,
+                        chkreTin: Form.chkreTin,
+                        chkreBar: Form.chkreBar,
+                        chkreAcaEx: Form.chkreAcaEx,
+                        chkreAcaPro: Form.chkreAcaPro,
+                        VUsers: Form.VUsers,
+                        VVendedores: Form.VVendedores,
+                        Estado: Form.Estado
+                    };
+                    _products[index] = _product;
+
+
+
+
+
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+            }
+
+
             } else {
+              
+                const { id, ...formWithoutId } = Form;
 
-                const response =  await supabase.from("Usuarios").insert(Form);
-                 
-
-                console.log(response);
+                console.log(formWithoutId);
+               
+                const response =  await supabase.from("Usuarios").insert(formWithoutId);
+               
+                console.log(response.data)
 
 
                // _product.id = createId();
@@ -164,8 +234,8 @@ const Usuarios: React.FC = () => {
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     };
 
-   /* const findIndexById = (id: string | null): number => {
-        /*let index = -1;
+    const findIndexById = (id: number): number => {
+        let index = -1;
         if (id !== null && products) {
             for (let i = 0; i < products.length; i++) {
                 if (products[i].id === id) {
@@ -175,7 +245,7 @@ const Usuarios: React.FC = () => {
             }
         }
         return index;
-    };*/
+    };
     /*const createId = () => {
         let id = '';
         let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -321,6 +391,18 @@ const Usuarios: React.FC = () => {
         setForm(_product);
     };
 
+    const onCategoryChange2 = (e:any) => {
+        let _product = { ...Form };
+        _product['VUsers'] = e.value === 'Activo';
+        setForm(_product);
+    };
+
+    const onCategoryChange3 = (e:any) => {
+        let _product = { ...Form };
+        _product['VVendedores'] = e.value === 'Activo';
+        setForm(_product);
+    };
+
     const header = (
         <div className="flex flex-wrap gap-2 align-items-center justify-content-between">
             <h4 className="m-0">Listado Usuarios</h4>
@@ -416,9 +498,36 @@ const Usuarios: React.FC = () => {
                         </div>
                 </div>
                 </div>
+                <div className="field">
+                    <label className="mb-3 font-bold"> Vista Usuarios</label>
+                    <div className="formgrid grid">
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="VUsers" name="VUsers" value="Activo" onChange={onCategoryChange2} checked={Form.VUsers === true} />
+                            <label htmlFor="category1">Activo</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="VUsers" name="VUsers" value="No Activo" onChange={onCategoryChange2} checked={Form.VUsers === false} />
+                            <label htmlFor="category2">No Activo</label>
+                        </div>
+                </div>
+                </div>
+                <div className="field">
+                    <label className="mb-3 font-bold"> Vista Vendedores</label>
+                    <div className="formgrid grid">
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="VVendedores" name="VVendedores" value="Activo" onChange={onCategoryChange3} checked={Form.VVendedores === true} />
+                            <label htmlFor="category1">Activo</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="VVendedores" name="VVendedores" value="No Activo" onChange={onCategoryChange3} checked={Form.VVendedores === false} />
+                            <label htmlFor="category2">No Activo</label>
+                        </div>
+                </div>
+                </div>
+                
                
                 <div className="field">
-                    <label className="mb-3 font-bold">Vista Presupuestado</label>
+                    <label className="mb-3 font-bold">Vista Detalle Presupuestado</label>
                     <div className="formgrid grid"> 
                         <div className="field-radiobutton col-6">
                                 <Checkbox inputId="category1" name="chkpreMat"  onChange={onCategoryChange} checked={Form.chkpreMat} />
@@ -446,17 +555,32 @@ const Usuarios: React.FC = () => {
                         </div>
                     </div>
                     <div className='field'>
-                    <h3 className="text-lg font-medium mb-2">Vista Real</h3>
+                    <h3 className="text-lg font-medium mb-2">Vista Detalle Real</h3>
                     <div className="formgrid grid">
-                    {Vistas.map((vi) => (
-                    <div key={vi.id} className="field-radiobutton col-6">
-                    <Checkbox inputId={vi.vista} name="category" value={vi} onChange={onCategoryChange} checked={selectedCategories.some((item) => item.id === vi.id)} />
-                            <label htmlFor={"category" + vi.id}>
-                                {vi.vista}
-                            </label>
-
-                    </div>
-            ))}
+                    <div className="field-radiobutton col-6">
+                                <Checkbox inputId="category1" name="chkreMat"  onChange={onCategoryChange} checked={Form.chkreMat} />
+                            <label htmlFor="category1">Materiales</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                            <Checkbox inputId="category2" name="chkrePlan"  onChange={onCategoryChange} checked={Form.chkrePlan} />
+                            <label htmlFor="category2">Planchas</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                            <Checkbox inputId="category3" name="chkreTin" onChange={onCategoryChange} checked={Form.chkreTin} />
+                            <label htmlFor="category3">Tintas</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                            <Checkbox inputId="category4" name="chkreBar"  onChange={onCategoryChange} checked={Form.chkreBar} />
+                            <label htmlFor="category4">Barniz</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                        <Checkbox inputId="category5" name="chkreAcaPro"  onChange={onCategoryChange} checked={Form.chkreAcaPro} />
+                        <label htmlFor="category5">Acabados Propios</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                        <Checkbox inputId="category6" name="chkreAcaEx"  onChange={onCategoryChange} checked={Form.chkreAcaEx} />
+                        <label htmlFor="category6">Acabados Externos</label>
+                        </div>
           </div>
         </div> 
         </div>
@@ -553,4 +677,8 @@ const Usuarios: React.FC = () => {
 
 
 export default Usuarios;
+
+function findIndexById(id: number) {
+    throw new Error('Function not implemented.');
+}
 

@@ -27,7 +27,8 @@
     "react-router-dom": "^6.22.3",
     "react-spinners": "^0.13.8",
     "sonner": "^1.4.41",
-    "sweetalert2": "^11.10.8"
+    "sweetalert2": "^11.10.8",
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

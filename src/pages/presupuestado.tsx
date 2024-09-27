@@ -16,6 +16,7 @@ import { IoSearch } from "react-icons/io5";
 import { RiSave3Fill } from "react-icons/ri";
 import { AudioProps,Audio } from 'react-loader-spinner'
 import {supabase} from '../services/fetch'
+import {useUserStore} from '../store/UserStore'
 
 
 interface FormattedDataItem {
@@ -45,7 +46,12 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const [moneda,setMoneda] = useState<string>('');
     const [loading,setLoading] = useState<boolean>(false);
     const [dataAcaProp,setdataAcaProp] = useState<AcaProPOt[]>([]);
+    const {User} = useUserStore();
 
+
+
+
+    //console.log(User[0].image);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>)=> {
 
@@ -399,18 +405,18 @@ const handleSubmit = async() => {
               ariaLabel="three-dots-loading" />
           </div><span>Cargando...</span></>
      }
-     <h1>Materiales</h1>
-    <MatOtTable matot={data} onChangeCantidad={handleCantidadChange} onChangeCOSTOUND={handleCOSTOUNDChange} />
-    <h1>Planchas</h1>
-    <PlanOtTable planot={dataPlan} onChangeCantidad={handleCantidadChangePlan} onChangeCOSTOUND={handleCOSTOUNDChangePlan} />
-    <h1>Tintas</h1>
-    <TinOtTable tinot={dataTin}  onChangeCantidad={handleCantidadChangeTin} onChangeCOSTOUND={handleCOSTOUNDChangeTin} />
-    <h1>Barniz</h1>
-    <BarOtTable barot={dataBar} onChangeCantidad={handleCantidadChangeBar} onChangeCOSTOUND={handleCOSTOUNDChangeBar} />
-    <h1>Acabados Manuales Propios</h1>
-     <AcaPropOtTable acaproot={dataAcaProp} onChangeCantidad={handleCantidadChangeAcaPro} onChangeCOSTOUND={handleCOSTOUNDChangeAcaPro}/>
-    <h1>Acabados Manuales Externos</h1>
-    <AcaOtTable acaot={dataAca} onChangeCantidad={handleCantidadChangeAca} onChangeCOSTOUND={handleCOSTOUNDChangeAca} />
+   { User[0].chkpreMat && <h1>Materiales</h1>}
+   { User[0].chkpreMat && <MatOtTable matot={data} onChangeCantidad={handleCantidadChange} onChangeCOSTOUND={handleCOSTOUNDChange} />}
+   { User[0].chkprePlan && <h1>Planchas</h1>}
+   { User[0].chkprePlan && <PlanOtTable planot={dataPlan} onChangeCantidad={handleCantidadChangePlan} onChangeCOSTOUND={handleCOSTOUNDChangePlan} />}
+   { User[0].chkpreTin && <h1>Tintas</h1>}
+   { User[0].chkpreTin && <TinOtTable tinot={dataTin}  onChangeCantidad={handleCantidadChangeTin} onChangeCOSTOUND={handleCOSTOUNDChangeTin} />}
+   { User[0].chkpreBar && <h1>Barniz</h1>}
+   { User[0].chkpreBar && <BarOtTable barot={dataBar} onChangeCantidad={handleCantidadChangeBar} onChangeCOSTOUND={handleCOSTOUNDChangeBar} />}
+   { User[0].chkpreAcaPro && <h1>Acabados Manuales Propios</h1>}
+   { User[0].chkpreAcaPro &&  <AcaPropOtTable acaproot={dataAcaProp} onChangeCantidad={handleCantidadChangeAcaPro} onChangeCOSTOUND={handleCOSTOUNDChangeAcaPro}/>}
+   { User[0].chkpreAcaEx && <h1>Acabados Manuales Externos</h1>}
+   { User[0].chkpreAcaEx && <AcaOtTable acaot={dataAca} onChangeCantidad={handleCantidadChangeAca} onChangeCOSTOUND={handleCOSTOUNDChangeAca} />}
     </div>
     </>
    )

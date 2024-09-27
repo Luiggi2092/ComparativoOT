@@ -16,7 +16,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { AudioProps,Audio } from 'react-loader-spinner'
 import {supabase} from '../services/fetch';
-
+import {useUserStore} from '../store/UserStore';
 
 
 
@@ -34,6 +34,9 @@ const Real : React.FC<AudioProps> = ({}) =>{
     const [op,setOp] = useState<string>('');
     const [moneda,setMoneda] = useState<string>('');
     const [loading,setLoading] = useState<boolean>(false);
+    const UserLocal = JSON.parse(localStorage.getItem('User') || '[]');
+    const {User} = useUserStore();
+
 
     /*const titleStyle: React.CSSProperties = {
       backgroundColor: '#CCCCCC',
@@ -247,18 +250,18 @@ const Real : React.FC<AudioProps> = ({}) =>{
               ariaLabel="three-dots-loading" />
           </div><span>Cargando...</span></>
 }
-     <h1>Materiales</h1>
-     <OtRealtabla otreal={data} listado={handleSearch} />
-     <h1>Planchas</h1>
-    <PlanOtTableReal planot={dataPlan} listado={handleSearch}/>
-    <h1>Tintas</h1>
-    <TinOtTableReal tinot={dataTin} listado={handleSearch}/>
-    <h1>Barniz</h1>
-    <BarOtTableReal barot={dataBar} listado={handleSearch} />
-    <h1>Acabados Manuales Propias</h1>
-    <AcaProOtTableReal acaProOt={dataAcaProp} listado={handleSearch}/>
-    <h1>Acabados Manuales Externos</h1>
-     <AcaOtTableReal acaot={dataAca} listado={handleSearch} />
+    {User[0].chkreMat && <h1>Materiales</h1>}
+    {User[0].chkreMat && <OtRealtabla otreal={data} listado={handleSearch} />}
+    {User[0].chkrePlan && <h1>Planchas</h1>}
+    {User[0].chkrePlan && <PlanOtTableReal planot={dataPlan} listado={handleSearch}/>}
+    {User[0].chkreTin &&<h1>Tintas</h1>}
+    {User[0].chkreTin && <TinOtTableReal tinot={dataTin} listado={handleSearch}/>}
+    {User[0].chkreBar && <h1>Barniz</h1>}
+    {User[0].chkreBar && <BarOtTableReal barot={dataBar} listado={handleSearch} />}
+    {User[0].chkreAcaPro && <h1>Acabados Manuales Propias</h1>}
+    {User[0].chkpreAcaPro && <AcaProOtTableReal acaProOt={dataAcaProp} listado={handleSearch}/>}
+    {User[0].chkpreAcaEx && <h1>Acabados Manuales Externos</h1>}
+    {User[0].chkpreAcaEx && <AcaOtTableReal acaot={dataAca} listado={handleSearch} />}
      <h1>Servicios</h1>
      {/* <OtRealSerTable otSer={''} listado={handleSearch} /> */}
     </div>

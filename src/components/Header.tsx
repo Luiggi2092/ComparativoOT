@@ -1,11 +1,16 @@
 import Logo from '../assets/isograf.jpg'
 import { Link,Outlet } from 'react-router-dom';
 import React, { useState } from 'react';
-import image from '../assets/photo.png'
+//import image from '../assets/photo.png'
+import {useUserStore} from '../store/UserStore'
 
 const Header:React.FC = () => {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const UserLocal = JSON.parse(localStorage.getItem('User') || '[]');
+    const {User}= useUserStore();
+
+    console.log(UserLocal[0].image);
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -25,17 +30,17 @@ const Header:React.FC = () => {
                 </li>
                 <li style={{listStyle:'none',position:'relative'}}>
                 <Link to={'#'} style={{color:'white',background:'none',border:'none',fontSize:16,cursor:'pointer',position:'relative'}} onClick={toggleDropdown}>
-                <img src={image} style={{borderRadius:50,height:30,width:30}} />
+                {<img src={User[0].image ?? undefined  } style={{borderRadius:50,height:30,width:30}} />}
                 </Link>
                 </li>
                 {isDropdownOpen && (
             <ul style={{position:'absolute',top:'100%',right:0,backgroundColor:'white',color:'black',borderRadius:'5px',padding:'10px',boxShadow:'0 8px 16px rgba(0, 0, 0, 0.2)',listStyle:'none',margin:0,minWidth:150,zIndex:1}}>
-              <li style={{margin:0}}>
+             {User[0].VVendedores && <li style={{margin:0}}>
                 <Link to="/" onClick={toggleDropdown}>Vendedores</Link>
-              </li>
-              <li>
+              </li>}
+             { User[0].VUsers && <li>
               <Link to="/usuarios" onClick={toggleDropdown}>Usuarios</Link>
-              </li>
+              </li>}
               <li>
               <Link to="/">Salir</Link>
               </li>

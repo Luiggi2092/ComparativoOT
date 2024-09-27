@@ -21,8 +21,6 @@ export interface OtData  {
 export const MatOtTable : React.FC<otDataTable> = ({matot,onChangeCantidad,onChangeCOSTOUND}) => {
 
 
-   
-
     return (
         <table className='table'>
             <thead style={{backgroundColor:'blue',color:"white"}}>
@@ -56,7 +54,7 @@ export const MatOtTable : React.FC<otDataTable> = ({matot,onChangeCantidad,onCha
                     </tr>
                 ))}
             </tbody>
-        </table>
+        </table> 
     )
 
 
