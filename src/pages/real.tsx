@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { OtRealtabla } from "../components/tableRealOt";
 import {OtReal} from '../types/OtReal'
 import { PlanOtTableReal } from '../components/tablePlanOtReal';
@@ -34,7 +34,6 @@ const Real : React.FC<AudioProps> = ({}) =>{
     const [op,setOp] = useState<string>('');
     const [moneda,setMoneda] = useState<string>('');
     const [loading,setLoading] = useState<boolean>(false);
-    const UserLocal = JSON.parse(localStorage.getItem('User') || '[]');
     const {User} = useUserStore();
 
 
@@ -42,6 +41,12 @@ const Real : React.FC<AudioProps> = ({}) =>{
       backgroundColor: '#CCCCCC',
       // Otros estilos según sea necesario
     };*/
+
+
+    useEffect(()=> {
+      console.log('cambio');
+
+    },[User])
 
     
    

@@ -85,7 +85,7 @@ const Usuarios: React.FC = () => {
     const toast = useRef<Toast>(null);
     const dt = useRef<any>(null);
     const [Form,setForm]=useState(emptyProduct)
-    const {getUser} = useUserStore();
+    const {setUser} = useUserStore();
      
 
     useEffect(() => {
@@ -181,7 +181,14 @@ const Usuarios: React.FC = () => {
                         VVendedores: Form.VVendedores,
                         Estado: Form.Estado
                     };
+
+
+
+
                     _products[index] = _product;
+
+                     
+                    setUser([_product]);
 
 
 
@@ -227,8 +234,6 @@ const Usuarios: React.FC = () => {
     };
 
     const deleteProduct = () => {
-       // let _products = (products|| []).filter((val) => val.id !== product.id);
-       // setProducts(_products);
         setDeleteProductDialog(false);
         setProduct(emptyProduct);
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
@@ -246,17 +251,7 @@ const Usuarios: React.FC = () => {
         }
         return index;
     };
-    /*const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-
-        return id;
-    };*/
-
+    
     const exportCSV = () => {
         dt.current.exportCSV();
     };
@@ -295,8 +290,6 @@ const Usuarios: React.FC = () => {
         };
 
     const onInputChange = (e:any) => {
-        //const val = e.target.value as Product[T]; // Aquí estamos haciendo coincidir el tipo de valor con el tipo del campo en Product
-        //const  value = e.target.checked;
         const  property = e.target.name;
         const  value = e.target.value;
         console.log(e);       
@@ -325,14 +318,6 @@ const Usuarios: React.FC = () => {
     const imageBodyTemplate = (rowData:Product) => {
         return <img  src={rowData.image ? rowData.image : 'https://via.placeholder.com/64'}  alt={rowData.image || ''} className="shadow-2 border-round" style={{ width: '64px' }} />;
     };
-
-    /*const priceBodyTemplate = (rowData:Product) => {
-        return formatCurrency(rowData.price);
-    };
-
-    const ratingBodyTemplate = (rowData:Product) => {
-        return <Rating value={rowData.rating} readOnly cancel={false} />;
-    };*/
 
     const statusBodyTemplate = (rowData:Product) => {
         return <Tag value={rowData.Estado ? 'Activo':'No Activo'} severity={getSeverity(rowData)}></Tag>;
@@ -584,67 +569,6 @@ const Usuarios: React.FC = () => {
           </div>
         </div> 
         </div>
-                {/* <div className="field">
-                    <label className="mb-3 font-bold">Vista Presupuestado</label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.rol === 'Accessories'} />
-                            <label htmlFor="category1">Materiales</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.rol === 'Clothing'} />
-                            <label htmlFor="category2">Planchas</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.rol === 'Electronics'} />
-                            <label htmlFor="category3">Tintas</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.rol === 'Fitness'} />
-                            <label htmlFor="category4">Barniz</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                        <RadioButton inputId="category5" name="category" value="Fitness" onChange={onCategoryChange} checked={product.rol === 'Fitness'} />
-                        <label htmlFor="category5">Acabados Propios</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                        <RadioButton inputId="category6" name="category" value="Fitness" onChange={onCategoryChange} checked={product.rol === 'Fitness'} />
-                        <label htmlFor="category6">Acabados Externos</label>
-                        </div>
-                    </div>
-          <h3 className="text-lg font-medium mb-2">Vista Real</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {Vistas.map((vi) => (
-              <div key={vi.id} className="flex items-center space-x-2">
-                  <Checkbox inputId={vi.vista} name="category" value={vi} onChange={onCategoryChange} checked={selectedCategories.some((item) => item.id === vi.id)} />
-                            <label htmlFor={vi.vista} className="ml-2">
-                                {vi.vista}
-                            </label>
-
-              </div>
-            ))}
-          </div>
-        </div> */}
-     
-
-                   {/* /* <label className="mb-3 font-bold">Vista Real</label>
-                    <div className='flex flex-wrap justify-content-space-evenly'>
-                              
-                {Vistas.map((vi,index) => {
-                    console.log(vi);
-                    return (
-                        <div key={vi.id} className="flex align-items-center w-7 md:w-6">
-                            <Checkbox inputId={vi.vista} name="category" value={vi} onChange={onCategoryChange} checked={selectedCategories.some((item) => item.id === vi.id)} />
-                            <label htmlFor={vi.vista} className="ml-2">
-                                {vi.vista}
-                            </label>
-
-                        </div>
-                    );
-                })}
-            </div>
-  
-            </div>*/ }
 
                  
 
@@ -678,7 +602,5 @@ const Usuarios: React.FC = () => {
 
 export default Usuarios;
 
-function findIndexById(id: number) {
-    throw new Error('Function not implemented.');
-}
+
 

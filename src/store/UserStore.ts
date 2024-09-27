@@ -28,7 +28,9 @@ interface Product {
 interface UserState {
     count:number;
     User: Product[];
-    getUser: (value: Product[]) => void
+    getUser: (value: Product[]) => void,
+    setUser: (value: Product[]) => void,
+    
 }
 
 
@@ -45,7 +47,11 @@ export const useUserStore = create<UserState>((set)=> {
      ...state,   
      User
     })) 
-    }
+    },
+    setUser: (newProducts:any) => {
+        localStorage.setItem('User', JSON.stringify(newProducts));
+        set({ User: newProducts });
+    },
    }
     
 })
