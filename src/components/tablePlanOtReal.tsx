@@ -2,6 +2,7 @@ import './tablestyle.css';
 import { useState } from 'react';
 import Modal from './Modal';
 import {OtReal} from '../types/OtReal'
+import { Button } from 'primereact/button';
 
 
 
@@ -88,7 +89,7 @@ export const PlanOtTableReal : React.FC<PlanDataOtReal> = ({planot,listado}) => 
                          <td style={{textAlign: 'center'}}>{plare.ImaPun}</td>
                          <td style={{textAlign: 'center'}}>{plare.SubtotalReal}</td>
                          <td style={{textAlign: 'center'}}>
-                         <button onClick={() => handleOpenModal(plare.id,plare.Concepto,plare.ImaCan,plare.ImaPun)}>Editar</button>
+                         <Button onClick={() => handleOpenModal(plare.id,plare.Concepto,plare.ImaCan,plare.ImaPun)}label='Editar' icon="pi pi-pencil" severity="success" rounded/>
                          </td>
                      </tr>   
 

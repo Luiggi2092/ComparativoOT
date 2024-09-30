@@ -49,8 +49,10 @@ export const useUserStore = create<UserState>((set)=> {
     })) 
     },
     setUser: (newProducts:any) => {
+        if(newProducts[0].id == parsedData[0].id){
         localStorage.setItem('User', JSON.stringify(newProducts));
         set({ User: newProducts });
+        }
     },
    }
     

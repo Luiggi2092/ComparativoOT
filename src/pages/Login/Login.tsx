@@ -46,7 +46,6 @@ const Login: React.FC = () => {
        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Credenciales incorrectas', life: 3000 });
     }
     
-    // Lógica de autenticación aquí
     
   };
 

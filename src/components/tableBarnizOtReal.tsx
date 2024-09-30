@@ -2,6 +2,7 @@ import './tablestyle.css';
 import Modal from './Modal';
 import { useState } from 'react';
 import {OtReal} from '../types/OtReal'
+import { Button } from 'primereact/button';
 
 
 export interface BarnizDataOtReal {
@@ -88,7 +89,7 @@ export const BarOtTableReal: React.FC<BarnizDataOtReal> = ({barot,listado}) => {
                             <td style={{textAlign: 'center'}}>{bar.ImaPun}</td>
                             <td style={{textAlign: 'center'}}>{bar.SubtotalReal}</td>
                             <td style={{textAlign: 'center'}}>
-                           <button onClick={() => handleOpenModal(bar.id,bar.Concepto,bar.ImaCan,bar.ImaPun)}>Editar</button>
+                           <Button onClick={() => handleOpenModal(bar.id,bar.Concepto,bar.ImaCan,bar.ImaPun)} label='Editar' icon="pi pi-pencil" severity="success" rounded/>
                           </td>
                         </tr>
                     ))}

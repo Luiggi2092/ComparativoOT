@@ -4,6 +4,7 @@ import Real from './pages/real';
 import Presupuestado from './pages/presupuestado';
 import Login from './pages/Login/Login';
 import  Usuarios  from './pages/Usuarios/Usuarios';
+import Vendedores from './pages/Vendedores/Vendedores';
 import { Routes, Route,useLocation} from 'react-router-dom';
 
 
@@ -23,6 +24,7 @@ const App: React.FC = () => {
      <Route path='/pre'  element={<Presupuestado/>}/>
      <Route path="/real" element={<Real/>} />
      <Route path='/usuarios' element={<Usuarios/>}/>
+     <Route path='/ven' element={<Vendedores/>}/>
      </Routes>
     </div> 
   )

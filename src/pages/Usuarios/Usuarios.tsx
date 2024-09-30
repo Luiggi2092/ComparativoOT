@@ -20,6 +20,10 @@ import axios from "axios"
 const url = 'https://api.cloudinary.com/v1_1/dpq8kiocc/image/upload'
 import {supabase} from '../../services/fetch';
 import { useUserStore} from '../../store/UserStore'
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
+
 
 
 
@@ -95,13 +99,118 @@ const Usuarios: React.FC = () => {
     }, []);
 
 
+    
+ 
+ 
+
     useEffect(() => {
         setForm({ ...Form, ...product });
+        
     }, [product]);
 
+    function loadImage(url: string): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+          const img = new Image()
+          img.crossOrigin = "anonymous"
+          img.onload = () => resolve(img)
+          img.onerror = () => reject(new Error("Failed to load image"))
+          img.src = url
+        })
+      }
 
 
+    const handleDownloadPDF = async () => {
+        const doc = new jsPDF()
 
+       // Añadir título y fecha
+    doc.setFontSize(18);
+    doc.text("Lista de Usuarios", 14, 22);
+    doc.setFontSize(11);
+    doc.text(new Date().toLocaleDateString(), 14, 30);
+
+    // Cargar todas las imágenes antes de crear la tabla
+    const loadedImages = await Promise.all(
+        products.map(async (user) => {
+            if (user.image) {
+                try {
+                    const img = await loadImage(user.image);
+                    return { id: user.id, img };
+                } catch (error) {
+                    console.error(`Error loading image for user ${user.id}: ${error}`);
+                    return { id: user.id, img: null };
+                }
+            }
+            return { id: user.id, img: null };
+        })
+    );
+
+    // Crear un mapa de imágenes para un acceso más fácil
+    const imageMap = new Map(loadedImages.map((item) => [item.id, item.img]));
+
+    // Preparar datos de la tabla, omitiendo el ID de la imagen
+    const tableData = products.map((user, index) => [
+        (index + 1).toString(),
+        user.id, // Solo se usa para recuperar la imagen en didDrawCell, no se muestra en la tabla
+        user.Login,
+        user.nombre,
+        user.Estado ? "Activo" : "Inactivo"
+    ]);
+
+    // Definir el tamaño de la imagen y el padding
+    const imageDim = 20;
+    const cellPadding = 5;
+
+    // Dibujar tabla
+    autoTable(doc, {
+        head: [["#", "Imagen", "Login", "Nombre", "Estado"]],
+        body: tableData,
+        startY: 40,
+        columnStyles: {
+            0: { cellWidth: 10 },
+            1: { cellWidth: imageDim + (2 * cellPadding) }, // Reservar espacio para la imagen
+            2: { cellWidth: 40 },
+            3: { cellWidth: 60 },
+            4: { cellWidth: 30 }
+        },
+        headStyles: {
+            cellPadding: 5,
+            fillColor: [200, 220, 255],
+            textColor: [0, 0, 0],
+            fontStyle: 'bold'
+        },
+        bodyStyles: {
+            cellPadding: cellPadding,
+            minCellHeight: imageDim + (2 * cellPadding)
+        },
+        didDrawCell: (data) => {
+            if (data.column.index === 1 && data.cell.section === 'body') {
+                const userId = tableData[data.row.index][1]; // Obtener el ID de la imagen desde tableData
+                const img = imageMap.get(Number(userId));
+                if (img) {
+                    const cellCenter = {
+                        x: data.cell.x + (data.cell.width - imageDim) / 2,
+                        y: data.cell.y + (data.cell.height - imageDim) / 2
+                    };
+                    // Solo dibujamos la imagen si está completamente dentro de la página actual
+                    if (cellCenter.y + imageDim <= doc.internal.pageSize.height) {
+                        doc.addImage(img, 'JPEG', cellCenter.x, cellCenter.y, imageDim, imageDim);
+                    }
+                } else {
+                    doc.setFontSize(8);
+                    doc.text('No image', data.cell.x + cellPadding, data.cell.y + cellPadding + 5);
+                }
+            }
+        },
+        didDrawPage: (data) => {
+            // Añadir número de página
+            doc.setFontSize(10);
+            doc.text(`Página ${data.pageNumber}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
+        }
+    });
+       
+        // Guardar el PDF
+        doc.save('ListaUsuarios.pdf');
+      };
 
     const openNew = () => {
         setProduct(emptyProduct);
@@ -131,6 +240,15 @@ const Usuarios: React.FC = () => {
             console.log("holitas")
             if (product.id > 0) {
                 const index = findIndexById(product.id);
+                
+                console.log(index);
+
+                const response = await supabase
+                .from('Usuarios')
+                .select()
+                .lt('Login', product.Login)
+
+                console.log(response);
 
 
                 const {error} = await supabase.from('Usuarios').update(
@@ -184,10 +302,10 @@ const Usuarios: React.FC = () => {
 
 
 
-
                     _products[index] = _product;
 
                      
+                   
                     setUser([_product]);
 
 
@@ -208,11 +326,35 @@ const Usuarios: React.FC = () => {
                
                 console.log(response.data)
 
+                const response2 = await supabase
+                .from('Usuarios')
+                .select()
+                .match({ Login : Form.Login})
 
-               // _product.id = createId();
+                const result = response2.data || [];
+
+
+                _product.Password = Form.Password;
                 _product.image = Form.image;
                 _product.Login = Form.Login;
                 _product.nombre = Form.nombre;
+                _product.id = result[0].id
+                _product.Estado = Form.Estado;
+                _product.VVendedores = Form.VVendedores;
+                _product.VUsers = Form.VUsers;
+                _product.chkpreMat = Form.chkpreMat;
+                _product.chkprePlan = Form.chkprePlan;
+                _product.chkpreTin = Form.chkpreTin;
+                _product.chkpreBar = Form.chkpreBar;
+                _product.chkpreAcaPro = Form.chkpreAcaPro;
+                _product.chkpreAcaEx = Form.chkpreAcaEx;
+                _product.chkreMat = Form.chkreMat;
+                _product.chkrePlan = Form.chkrePlan;
+                _product.chkreTin = Form.chkreTin;
+                _product.chkreBar = Form.chkreBar;
+                _product.chkreAcaPro = Form.chkreAcaPro;
+                _product.chkreAcaEx = Form.chkpreAcaEx;
+
                 _products.push(_product);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
             }
@@ -233,9 +375,26 @@ const Usuarios: React.FC = () => {
         setDeleteProductDialog(true);
     };
 
-    const deleteProduct = () => {
+    const deleteProduct = async() => {
+        
+        let _products = [...(products || [])];
         setDeleteProductDialog(false);
         setProduct(emptyProduct);
+        
+        const response = await supabase
+        .from('Usuarios')
+        .delete()
+        .eq('id', Form.id); 
+
+        if(!response.error){
+            const nuevosProductos = _products.filter(producto => producto.id !== Form.id);
+            setProducts(nuevosProductos);
+
+        }else{
+            
+
+        }
+
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     };
 
@@ -252,18 +411,24 @@ const Usuarios: React.FC = () => {
         return index;
     };
     
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    };
+    // const exportCSV = () => {
+    //     dt.current.exportCSV();
+    // };
 
     const confirmDeleteSelected = () => {
         setDeleteProductsDialog(true);
     };
 
 
-    const deleteSelectedProducts = () => {
+    const deleteSelectedProducts = async() => {
         if (selectedProducts) {
             let _products = products.filter((val) => !selectedProducts.includes(val));
+             selectedProducts.map (item => {
+        
+                 UsersService.deleteUser(item.id);
+                 
+             }); 
+
             console.log(selectedProducts)
             console.log(_products);
             setProducts(_products);
@@ -312,7 +477,7 @@ const Usuarios: React.FC = () => {
     };
 
     const rightToolbarTemplate = () => {
-        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} />;
+        return <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={handleDownloadPDF} />;
     };
 
     const imageBodyTemplate = (rowData:Product) => {

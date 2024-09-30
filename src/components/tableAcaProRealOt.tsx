@@ -1,6 +1,7 @@
 import './tablestyle.css';
 import Modal from './Modal';
 import { useState } from 'react';
+import { Button } from 'primereact/button';
 
 export interface AcaProOtReal {
     CODIGO:bigint,
@@ -97,7 +98,7 @@ export const AcaProOtTableReal : React.FC<OtDataProAca> = ({acaProOt,listado}) =
                     <td  style={{textAlign: 'center'}}>{aca.ImaPun}</td>
                     <td  style={{textAlign: 'center'}}>{aca.SubtotalReal}</td>
                     <td style={{textAlign: 'center'}}>
-                    <button onClick={() => handleOpenModal(aca.CODIGO,aca.Concepto,aca.ImaCan,aca.ImaPun)}>Editar</button>
+                    <Button onClick={() => handleOpenModal(aca.CODIGO,aca.Concepto,aca.ImaCan,aca.ImaPun)} label='Editar' icon="pi pi-pencil" severity="success" rounded/>
                     </td>
 
                 </tr>

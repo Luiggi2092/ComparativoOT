@@ -2,6 +2,7 @@ import './tablestyle.css';
 import Modal from './Modal';
 import { useState } from 'react';
 import  {OtReal} from '../types/OtReal'
+import { Button } from 'primereact/button';
 
 
 
@@ -96,7 +97,7 @@ export const OtRealtabla : React.FC<otDataRealTable> = ({otreal,listado}) => {
                     <td style={{textAlign: 'center'}}>{mat.ImaPun}</td>
                     <td style={{textAlign: 'center'}}>{mat.SubtotalReal}</td>
                     <td style={{textAlign: 'center'}}>
-                    <button onClick={() => handleOpenModal(mat.id,mat.Concepto,mat.ImaCan,mat.ImaPun)}>Editar</button>
+                    <Button onClick={() => handleOpenModal(mat.id,mat.Concepto,mat.ImaCan,mat.ImaPun)} label='Editar' icon="pi pi-pencil" severity="success" rounded/>
                     </td>
                 </tr>
                 

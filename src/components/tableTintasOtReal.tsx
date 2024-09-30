@@ -2,6 +2,7 @@ import './tablestyle.css';
 import Modal from './Modal';
 import { useState } from 'react';
 import {OtReal} from '../types/OtReal'
+import { Button } from 'primereact/button';
 
 
 export interface OtDataTintaTableReal {
@@ -88,7 +89,7 @@ export const TinOtTableReal : React.FC<OtDataTintaTableReal> = ({tinot,listado})
                         <td style={{textAlign: 'center'}}>{tin.ImaPun}</td>
                         <td style={{textAlign: 'center'}}>{tin.SubtotalReal}</td>
                         <td style={{textAlign: 'center'}}>
-                    <button onClick={() => handleOpenModal(tin.id,tin.Concepto,tin.ImaCan,tin.ImaPun)}>Editar</button>
+                    <Button onClick={() => handleOpenModal(tin.id,tin.Concepto,tin.ImaCan,tin.ImaPun)} label='Editar' icon="pi pi-pencil" severity="success" rounded/>
                     </td>
                     </tr>
                 ))}

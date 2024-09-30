@@ -5,18 +5,15 @@ import { PlanOtTableReal } from '../components/tablePlanOtReal';
 import { TinOtTableReal } from '../components/tableTintasOtReal';
 import { BarOtTableReal } from '../components/tableBarnizOtReal';
 import { AcaOtTableReal } from '../components/tableAcaOtReal';
-/*import { OtDataSer} from '../components/tableSerRealOt';
-import { OtRealSerTable } from '../components/tableSerRealOt';*/
 import { AcaProOtReal } from '../components/tableAcaProRealOt';
 import { AcaProOtTableReal } from '../components/tableAcaProRealOt';
 import { Toaster, toast } from 'sonner';
-import { IoSearch } from "react-icons/io5";
-import { IoPrintSharp } from "react-icons/io5";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { AudioProps,Audio } from 'react-loader-spinner'
 import {supabase} from '../services/fetch';
 import {useUserStore} from '../store/UserStore';
+import { Button } from 'primereact/button';
 
 
 
@@ -216,7 +213,8 @@ const Real : React.FC<AudioProps> = ({}) =>{
           (doc as any).autoTable({
             head: tableData.slice(0, 1),
             body: tableData.slice(1),
-            startY: 20
+            startY: 20,
+            
         });
 
   
@@ -242,8 +240,8 @@ const Real : React.FC<AudioProps> = ({}) =>{
     <div style={{display:'flex',gap:'5px'}}>
     <input placeholder='Ingrese OT' onChange={handleInputChange} style={{height:'3rem'}} />
     <div style={{height:'3rem'}}>
-    <button onClick={handleSearch} style={{backgroundColor:'blue',color:'white'}}><IoSearch style={{marginRight:'8px'}}></IoSearch>Buscar</button>
-    <button disabled={data.length === 0 } onClick={handleDownloadPDF}  ><IoPrintSharp style={{marginRight:'8px'}}></IoPrintSharp>Imprimir</button> 
+    <Button onClick={handleSearch} label="Buscar" style={{margin:' 0 1em'}} icon="pi pi-search" loading={loading}/>
+    <Button disabled={data.length === 0 } onClick={handleDownloadPDF} label='Imprimir' icon="pi pi-print" severity="success" raised />
     </div>
     </div>
     </div>

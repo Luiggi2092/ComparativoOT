@@ -12,11 +12,10 @@ import { AcaPropOtTable } from '../components/tableAcaProOt';
 import { BarOt } from '../components/tableBarnizOt';
 import { BarOtTable } from '../components/tableBarnizOt';
 import { Toaster, toast } from 'sonner';
-import { IoSearch } from "react-icons/io5";
-import { RiSave3Fill } from "react-icons/ri";
 import { AudioProps,Audio } from 'react-loader-spinner'
 import {supabase} from '../services/fetch'
 import {useUserStore} from '../store/UserStore'
+import { Button } from 'primereact/button';
 
 
 interface FormattedDataItem {
@@ -154,6 +153,8 @@ const Presupuestado : React.FC<AudioProps> = () => {
 
    const handleSearch = async () => {
 
+    setLoading(true);
+
     try{
 
         if(!Ot){
@@ -231,6 +232,10 @@ const Presupuestado : React.FC<AudioProps> = () => {
         setProducto(responseOt.data[0].OdtDescrip);
         setOp(responseOt.data[0].OdtCod)
         setMoneda(responseOt.data[0].OdtMon);
+
+        if(responseMat.data){
+           setLoading(false);
+        }
        
     }catch(error){
 
@@ -371,7 +376,7 @@ const handleSubmit = async() => {
         
      }finally{
  
-      setLoading(false);
+      //setLoading(false);
      }
      
     
@@ -392,8 +397,8 @@ const handleSubmit = async() => {
     <div style={{display:'flex',gap:'15px',justifyContent:'flex-end'}}>
     <input placeholder='Ingrese OT' onChange={handleInputChange} style={{height:'3rem'}} />
     <div style={{height:'3rem'}}>
-    <button onClick={handleSearch} style={{backgroundColor:'blue',color:'white',padding: '8px 16px'}}><IoSearch style={{marginRight: '8px'}}></IoSearch>Buscar</button>
-    <button onClick={handleSubmit} /*disabled={data.length === 0 }*/ ><RiSave3Fill style={{marginRight:'8px'}}></RiSave3Fill>Guardar</button> 
+    <Button onClick={handleSearch} label="Buscar" style={{margin:' 0 1em'}} icon="pi pi-search" loading={loading}/>
+    <Button onClick={handleSubmit} /*disabled={data.length === 0 }*/ label="Guardar" severity="danger" raised icon="pi pi-save" />
     </div>
     </div>
      </div>
