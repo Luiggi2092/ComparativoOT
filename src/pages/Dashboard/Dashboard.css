@@ -1,0 +1,18 @@
+/* styles.css */
+.custom-card {
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+.card-header {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.card-content {
+    font-size: 1rem;
+    color: #666;
+}
+

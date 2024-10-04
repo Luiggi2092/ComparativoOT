@@ -10,6 +10,7 @@ import { AcaProOtTableReal } from '../components/tableAcaProRealOt';
 import { Toaster, toast } from 'sonner';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable'
 import { AudioProps,Audio } from 'react-loader-spinner'
 import {supabase} from '../services/fetch';
 import {useUserStore} from '../store/UserStore';
@@ -118,111 +119,82 @@ const Real : React.FC<AudioProps> = ({}) =>{
     }
 
     
-    const handleDownloadPDF = async () => {
+    const handleDownloadPDF = () => {
+      const doc = new jsPDF()
+  
+      const now = new Date()
+      const date = now.toLocaleDateString()
+      doc.setFontSize(10)
+      doc.text(date, 190, 10, { align: 'right' })
+  
+      doc.setFontSize(16)
+      doc.text(`Presupuestado vs Real OT - ${op}`, 105, 20, { align: 'center' })
+      doc.setFontSize(12)
+      doc.text(`Producto: ${producto}`, 85, 30, { align: 'center' })
+  
+      let yOffset = 40 // Initial Y offset for the first table
+  
+      const addDataToTable = (dataArray: any[], title: string) => {
+        const titleHeight = 10 // Approximate height of the title
+        const tableHeight = dataArray.length * 8 + 15 // Approximate height of the table (8 per row + 15 for header)
         
-          const doc: jsPDF = new jsPDF();
-
-          // Agregar fecha y hora en la esquina superior derecha
-          const now = new Date();
-          const date = now.toLocaleDateString();
+        // Check if the title and table fit on the current page
+        if (yOffset + titleHeight + tableHeight > doc.internal.pageSize.height - 20) {
+          doc.addPage()
+          yOffset = 20
+        }
   
-          // Agregar fecha y hora en la esquina superior derecha
-          const dateAndTime = `${date}`;
+        doc.setFontSize(14)
+        doc.setTextColor(0, 128, 0) // Green color for title
+        doc.text(title, 105, yOffset, { align: 'center' })
+        
+        doc.setFontSize(10)
+        doc.setTextColor(0, 0, 0) // Reset to black for table content
+        
+        const headers = [['Concepto', 'Elemento', 'CANTPRE', 'COSTOUNDPRE', 'CANTREAL', 'COSTOUNDREAL']]
+        const data = dataArray.map(item => [
+          item.Concepto,
+          item.Elemento,
+          item.Cantidad.toString(),
+          item.PrecioUni.toString(),
+          item.ImaCan.toString(),
+          item.ImaPun.toString()
+        ])
   
-         
-          // Dibujar el texto en la posición calculada
-          doc.text(dateAndTime, 180, 10);
-
-
-          
-          doc.text(`Presupuestado vs Real OT - ${op}`, 10, 10);
-          doc.text(`Producto : ${producto}`,10,17);
+        autoTable(doc, {
+          head: headers,
+          body: data,
+          startY: yOffset + 5,
+          theme: 'grid',
+          styles: { fontSize: 8 },
+          headStyles: { 
+            fillColor: [0, 123, 255], // Blue
+            textColor: [255, 255, 255], // White
+            fontStyle: 'bold'
+          },
+          alternateRowStyles: { fillColor: [240, 240, 240] },
+          didDrawPage: (data) => {
+            // Prevent header repetition
+            data.settings.showHead = 'firstPage'
+          }
+        })
   
-          // Definir datos de la tabla
-          const tableData = [
-              ['Concepto', 'Elemento','CANTPRE','COSTOUNDPRE','CANTREAL','COSTOUNDREAL'] 
-            ];
-
-            
-
-
-            const addDataToTable = (dataArray: any[],title: string )=> {
-              if (dataArray.length > 0) {
-                  // Agregar título
-                  
-                
-                  //doc.text(title.text,12,10);
-                  //const titu = title.text;
-                  
-                  doc.setFillColor('#000000'); // Establecer el color de fondo
-                  doc.setTextColor('#CD5C5C'); // Establecer el color del texto
-
-                  //const styledTitleText = `<span style="color: red;">${title.text}</span>`
-                  tableData.push(['****' + title + '***************']);
-
-                 
-               
-                  
-                  //doc.setFontStyle('bold'); // Establecer el estilo de fuente en negrita
-                  //doc.autoTableText(title.text, 10, (doc as any).previous.finalY + 10, { styles: { valign: 'middle' } }); 
-                  //doc.autoTableText(title.text, 10, (doc as any).autoTable.previous.finalY + 10, { styles: { valign: 'middle' } }); // Agregar el título de la tabla
-                  //doc.text([title.text], 10, (doc as any).autoTable.previous.finalY + 10); 
-                  //tableData.push([title.text]);
-                  // Agregar datos
-                  dataArray.forEach(item => {
-                    if(dataArray == data){
-                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
-                    }
-                    else if (dataArray == dataPlan){
-                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
-                    }
-                    else if (dataArray == dataTin){
-                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
-                    }
-                    else if (dataArray == dataBar){
-                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
-                    }
-                    else if (dataArray == dataAcaProp){
-                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
-                    }
-                    else if (dataArray == dataAca){
-                      tableData.push([item.Concepto, item.Elemento, item.Cantidad.toString(), item.PrecioUni.toString(), item.ImaCan.toString(), item.ImaPun.toString()]);
-                    }
-                    /*else if (dataArray == dataSer){
-                      tableData.push([item.SERVICIO,item.Elemento,item.CANTPRE.toString(),item.COSTOUNPRE.toString(),item.CANTREAL.toString(),item.COSTOUNDREAL.toString()]);
-                    }*/
-                    });
-              }
-          };
-
-          //const subtitleStyle = { fillColor: '#CCCCCC', textColor: '#000000' };
-          
-
-    //const subtitleStyle = { fillColor: '#CCCCCC', textColor: '#000000' };
-          
-          //Agregar datos y titulos a a tabla
-          addDataToTable(data, 'Materiales');
-          addDataToTable(dataPlan, 'Planchas');
-          addDataToTable(dataTin, 'Tintas');
-          addDataToTable(dataBar,'Barniz');
-          addDataToTable(dataAcaProp, 'Acabados Manuales Propios');
-          addDataToTable(dataAca, 'Acabados Manuales Externos' );
-          //addDataToTable(dataSer,  "Servicios",);
-  
-          // Dibujar la tabla
-          (doc as any).autoTable({
-            head: tableData.slice(0, 1),
-            body: tableData.slice(1),
-            startY: 20,
-            
-        });
-
-  
-          // Guardar el PDF
-          doc.save(`RealOt-${op}.pdf`);
+        yOffset = (doc as any).lastAutoTable.finalY + 15
       }
   
-    
+      const sections = [
+        { title: 'Materiales', data: data },
+        { title: 'Planchas', data: dataPlan },
+        { title: 'Tintas', data: dataTin},
+        { title: 'Barniz', data:dataBar },
+        { title: 'Acabados Manuales Propios', data: dataAcaProp },
+        { title: 'Acabados Manuales Externos', data: dataAca },
+      ]
+  
+      sections.forEach(section => addDataToTable(section.data, section.title))
+  
+      doc.save(`RealOt-${op}.pdf`)
+    }
 
 
 

@@ -5,6 +5,7 @@ import Presupuestado from './pages/presupuestado';
 import Login from './pages/Login/Login';
 import  Usuarios  from './pages/Usuarios/Usuarios';
 import Vendedores from './pages/Vendedores/Vendedores';
+import DashboardWithChart from './pages/Dashboard/Dashboard';
 import { Routes, Route,useLocation} from 'react-router-dom';
 
 
@@ -25,6 +26,7 @@ const App: React.FC = () => {
      <Route path="/real" element={<Real/>} />
      <Route path='/usuarios' element={<Usuarios/>}/>
      <Route path='/ven' element={<Vendedores/>}/>
+     <Route path='/dash' element={<DashboardWithChart/>} />
      </Routes>
     </div> 
   )
