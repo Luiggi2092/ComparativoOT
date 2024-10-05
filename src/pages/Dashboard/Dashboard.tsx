@@ -36,8 +36,10 @@ const DashboardWithChart = () => {
   const [dataCarsOffset, setDataCarsOffset] = useState<dataCars[]>([]);
   const [dataCarsVisual, setDataCarsVisual] = useState<dataCars[]>([]);
   const [dataCarsMerch, setDataCarsMerch] = useState<dataCars[]>([]);
+  const [dataCarsUtility, setDataCarsUtility] = useState<dataCars[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const dt = useRef<any>(null);
+  const [dataCarsCantOt, setDataCarsCantOt] = useState<dataCars[]>([]);
 
   const cols = [
     { field: 'code', header: 'Code' },
@@ -56,7 +58,8 @@ const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field
     VentasServices.getVentasDataVisual().then((data:any) => { setDataCarsVisual(data[0].VVCliente)});
     VentasServices.getVentasDataMerch().then((data:any) => { setDataCarsMerch(data[0].VVCliente)});
     ProductService.getProductsMini().then((data:any) => setProducts(data));
-    
+    VentasServices.getUtilidadTotal().then((data:any) => { setDataCarsUtility(data[0].VVUtilidad)}); 
+    VentasServices.getCantOt().then((data:any) => { setDataCarsCantOt(data[0].count)});
 
     const dataBar = {
       labels: ['Vendedor01', 'Vendedor02', 'Vendedor03', 'Vendedor04','Vendedor05','Vendedor06','Vendedor07','Vendedor8','Vendedor09','Vendedor10'],
@@ -232,7 +235,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
   
           {/* Ventas Totales */}
           <Grid item xs={12} md={6} lg={3}>
-            <Paper elevation={3} sx={{ padding: '20px', backgroundColor: '#2196f3', color: '#fff' }}>
+            <Paper elevation={3} sx={{ padding: '20px', backgroundColor: '#C0C0C0', color: '#fff' }}>
               <Grid container alignItems="center">
                 <Grid item xs={3}>
                   <IconButton sx={{ color: '#fff' }}>
@@ -241,7 +244,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
                 </Grid>
                 <Grid item xs={9}>
                   <Typography variant="h6">Utilidad Total</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>S/.{dataCars.toString()}</Typography>	
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>S/.{dataCarsUtility.toString()}</Typography>	
                 </Grid>
               </Grid>
             </Paper>
@@ -258,7 +261,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
                 </Grid>
                 <Grid item xs={9}>
                   <Typography variant="h6">Cantidad de Ordenes</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>S/.{dataCarsOffset.toString()}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{dataCarsCantOt.toString()}</Typography>
                 </Grid>
               </Grid>
             </Paper>

@@ -29,6 +29,20 @@ export const VentasServices =  {
       console.log(error);
     }
     return data;
+   },
+   async getUtilidadTotal(){
+    const { data, error } = await supabase.from("vw_vvutilidad").select("*");
+    if (error) {
+      console.log(error);
+    }
+    return data;
+   },
+   async getCantOt(){
+    const { data, error } = await supabase.from("vw_vvcantot").select("*"); 
+    if (error) {
+      console.log(error);
+    }
+    return data;
    }
 
 
