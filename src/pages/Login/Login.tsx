@@ -35,7 +35,7 @@ const Login: React.FC = () => {
         
       localStorage.setItem('User',JSON.stringify(response.data) );
          
-        navigate('/pre');
+        navigate('/dash');
        }else{
         
        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Usuario Inactivo', life: 3000 }); 

@@ -43,7 +43,22 @@ export const VentasServices =  {
       console.log(error);
     }
     return data;
-   }
+   },
+   async getDataComisiones(){
+    const { data, error } = await supabase.from("vw_comi").select("*");
+    if (error) {
+      console.log(error);
+    }
+    return data;
+   },
+   async getDataBonificacion(){
+    const { data, error } = await supabase.from("vw_bom").select("*");
+    if (error) {
+      console.log(error);
+    }
+    return data;
+   },
+   
 
 
 }

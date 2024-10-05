@@ -40,6 +40,8 @@ const DashboardWithChart = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const dt = useRef<any>(null);
   const [dataCarsCantOt, setDataCarsCantOt] = useState<dataCars[]>([]);
+  const [dataComisiones, setDataComisiones] = useState<dataCars[]>([]);
+  const [dataBonificacion, setDataBonificacion] = useState<dataCars[]>([]);
 
   const cols = [
     { field: 'code', header: 'Code' },
@@ -60,6 +62,8 @@ const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field
     ProductService.getProductsMini().then((data:any) => setProducts(data));
     VentasServices.getUtilidadTotal().then((data:any) => { setDataCarsUtility(data[0].VVUtilidad)}); 
     VentasServices.getCantOt().then((data:any) => { setDataCarsCantOt(data[0].count)});
+    VentasServices.getDataComisiones().then((data:any) => { setDataComisiones(data[0].COMISUM)});
+    VentasServices.getDataBonificacion().then((data:any) => { setDataBonificacion(data[0].Bonificación)});
 
     const dataBar = {
       labels: ['Vendedor01', 'Vendedor02', 'Vendedor03', 'Vendedor04','Vendedor05','Vendedor06','Vendedor07','Vendedor8','Vendedor09','Vendedor10'],
@@ -278,7 +282,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
                 </Grid>
                 <Grid item xs={9}>
                   <Typography variant="h6">Total Comisiones</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>S/.{dataCarsVisual.toString()}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>S/.{dataComisiones.toString()}</Typography>
                 </Grid>
               </Grid>
             </Paper>
@@ -295,7 +299,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
                 </Grid>
                 <Grid item xs={9}>
                   <Typography variant="h6">Total Bonificacion</Typography>
-                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>S/.{dataCarsMerch.toString()}</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>S/.{dataBonificacion.toString()}</Typography>
                 </Grid>
               </Grid>
             </Paper>
