@@ -58,6 +58,20 @@ export const VentasServices =  {
     }
     return data;
    },
+   async getDataTotalVentasxVendedor(){
+    const { data, error } = await supabase.from("vistatotalventas").select("*");
+    if (error) {
+      console.log(error);
+    }
+    return data;
+   },
+   async getDataTotalVentasxCliente(){
+    const { data, error } = await supabase.from("Clientes").select("*");
+    if (error) {
+      console.log(error);
+    }
+    return data;
+   },
    
 
 

@@ -13,7 +13,7 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { VentasServices } from '../../services/DashboardServices/DashboardServices';
 import 'jspdf-autotable';
 import jsPDF from 'jspdf';
-import {ProductService} from '../../services/ProductServices/ProductService';
+//import {ProductService} from '../../services/ProductServices/ProductService';
 import autoTable from 'jspdf-autotable';
 
 const DashboardWithChart = () => {
@@ -22,13 +22,16 @@ const DashboardWithChart = () => {
     VVCliente:number
   }
 
-  interface Product {
-    code: string;
-    name: string;
-    category: string;
-    quantity: number;
+  // interface Product {
+  //   code: string;
+  //   name: string;
+  //   category: string;
+  //   quantity: number;
     
-  }
+  // }
+
+
+  interface dataVentTotal { Vendes:string,total:string}
 
   const [chartDataBar, setChartDataBar] = useState({});
   const [chartOptionsBar, setChartOptions] = useState({});
@@ -37,19 +40,20 @@ const DashboardWithChart = () => {
   const [dataCarsVisual, setDataCarsVisual] = useState<dataCars[]>([]);
   const [dataCarsMerch, setDataCarsMerch] = useState<dataCars[]>([]);
   const [dataCarsUtility, setDataCarsUtility] = useState<dataCars[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  //const [products, setProducts] = useState<Product[]>([]);
   const dt = useRef<any>(null);
   const [dataCarsCantOt, setDataCarsCantOt] = useState<dataCars[]>([]);
   const [dataComisiones, setDataComisiones] = useState<dataCars[]>([]);
   const [dataBonificacion, setDataBonificacion] = useState<dataCars[]>([]);
+  const [venTotales,setVenTotales] = useState<dataVentTotal[]>([]);
+  const [venTotalesCliente,setVenTotalesCliente] = useState<any[]>([]);
 
   const cols = [
-    { field: 'code', header: 'Code' },
-    { field: 'name', header: 'Name' },
-    { field: 'category', header: 'Category' },
-    { field: 'quantity', header: 'Quantity' }
+    { field: 'Cliruc', header: 'Ruc' },
+    { field: 'Clides', header: 'Cliente' },
+    { field: 'TotalVentas', header: 'Total Ventas' },
+    { field: 'Total Utilidad', header: 'Total Utilidad' }
 ];
-
 const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field }));
 
 
@@ -59,18 +63,20 @@ const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field
     VentasServices.getVentasDataOffset().then((data:any) => { setDataCarsOffset(data[0].VVCliente)});
     VentasServices.getVentasDataVisual().then((data:any) => { setDataCarsVisual(data[0].VVCliente)});
     VentasServices.getVentasDataMerch().then((data:any) => { setDataCarsMerch(data[0].VVCliente)});
-    ProductService.getProductsMini().then((data:any) => setProducts(data));
+   // ProductService.getProductsMini().then((data:any) => setProducts(data));
     VentasServices.getUtilidadTotal().then((data:any) => { setDataCarsUtility(data[0].VVUtilidad)}); 
     VentasServices.getCantOt().then((data:any) => { setDataCarsCantOt(data[0].count)});
     VentasServices.getDataComisiones().then((data:any) => { setDataComisiones(data[0].COMISUM)});
     VentasServices.getDataBonificacion().then((data:any) => { setDataBonificacion(data[0].Bonificación)});
+    VentasServices.getDataTotalVentasxVendedor().then((data:any) => {setVenTotales(data)});
+    VentasServices.getDataTotalVentasxCliente().then((data:any) => {setVenTotalesCliente(data)});
 
     const dataBar = {
-      labels: ['Vendedor01', 'Vendedor02', 'Vendedor03', 'Vendedor04','Vendedor05','Vendedor06','Vendedor07','Vendedor8','Vendedor09','Vendedor10'],
+      labels: venTotales.map((ven:any) => (ven.split_part)),
       datasets: [
           {
-              label: 'Sales',
-              data: [500000, 400000,300000,200000,100000,150000,250000,357580],
+              label: 'Ventas',
+              data: venTotales.map((ven:dataVentTotal) =>  String(Number(ven.total) /100)),
               backgroundColor: [
                   'rgba(255, 159, 64, 0.2)',
                   'rgba(75, 192, 192, 0.2)',
@@ -89,9 +95,14 @@ const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field
   };
   const optionsBar = {
       scales: {
-          y: {
-              beginAtZero: true
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value:any) {
+              return value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); // Formato con separadores de miles y dos decimales
+            }
           }
+        },
       }
   };
 
@@ -104,13 +115,12 @@ const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field
 const exportPdf = () => {
   const doc: any = new jsPDF(); // Usar 'any' para desactivar la verificación de tipo
   
-  console.log(products);
-  const tableData = products.map((user, index) => [
+  const tableData = venTotalesCliente.map((user, index) => [
     (index + 1).toString(),
-    user.code, // Solo se usa para recuperar la imagen en didDrawCell, no se muestra en la tabla
-    user.name,
-    user.category,
-    user.quantity
+    user.Cliruc, // Solo se usa para recuperar la imagen en didDrawCell, no se muestra en la tabla
+    user.Clides,
+    user.TotalVentas,
+    user['Total Utilidad']
 ]);
 
   autoTable(doc,{
@@ -124,7 +134,7 @@ const exportPdf = () => {
 
 const exportExcel = () => {
   import('xlsx').then((xlsx) => {
-      const worksheet = xlsx.utils.json_to_sheet(products);
+      const worksheet = xlsx.utils.json_to_sheet(venTotalesCliente);
       const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
       const excelBuffer = xlsx.write(workbook, {
           bookType: 'xlsx',
@@ -151,7 +161,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
 
   const header = (
     <div className="flex align-items-center justify-content-between gap-2">
-    <h2 className="mr-auto">Top 10 Clientes</h2>
+    <h2 className="mr-auto">Top 5 Clientes</h2>
     <div className="flex align-items- gap-2">
       <Button type="button" icon="pi pi-file-excel"  severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
       <Button type="button" icon="pi pi-file-pdf" severity="danger" rounded onClick={exportPdf} data-pr-tooltip="PDF" />
@@ -308,13 +318,13 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
       </Box>
       <div style={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0px 50px 0px', height: '480px' }}>
   <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-    <Chart type="bar" data={chartDataBar} options={chartOptionsBar} style={{ width: '90%', height: '90%' }} />
+    <Chart type="bar" data={chartDataBar} options={chartOptionsBar} style={{ width: '90%', height: '90%',fontSize:'1px' }} />
   </div>
   <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-  <div className="card">
+  <div className="card" style={{height:'100%'}}>
             <Tooltip target=".export-buttons>button" position="bottom"  />
 
-            <DataTable ref={dt} value={products} header={header} tableStyle={{ minWidth: '50rem' }}>
+            <DataTable ref={dt} value={venTotalesCliente} header={header} tableStyle={{ minWidth: '50rem' }}>
                 {cols.map((col, index) => (
                     <Column key={index} field={col.field} header={col.header} />
                 ))}
