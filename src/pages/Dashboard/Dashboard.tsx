@@ -3,11 +3,11 @@ import { Box, Grid, Paper, Typography, IconButton } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CategoryIcon from '@mui/icons-material/Category';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
-import { Chart } from 'primereact/chart';
 import {useState,useEffect,useRef} from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
+import ApexCharts from 'apexcharts'
 import { Tooltip } from 'primereact/tooltip';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import { VentasServices } from '../../services/DashboardServices/DashboardServices';
@@ -31,22 +31,22 @@ const DashboardWithChart = () => {
   // }
 
 
-  interface dataVentTotal { Vendes:string,total:string}
 
-  const [chartDataBar, setChartDataBar] = useState({});
-  const [chartOptionsBar, setChartOptions] = useState({});
-  const [dataCars, setDataCars] = useState<dataCars[]>([]);
-  const [dataCarsOffset, setDataCarsOffset] = useState<dataCars[]>([]);
-  const [dataCarsVisual, setDataCarsVisual] = useState<dataCars[]>([]);
-  const [dataCarsMerch, setDataCarsMerch] = useState<dataCars[]>([]);
-  const [dataCarsUtility, setDataCarsUtility] = useState<dataCars[]>([]);
-  //const [products, setProducts] = useState<Product[]>([]);
+  const [dataCars, setDataCars] = useState<any[]>([]);
+  const [dataCarsOffset, setDataCarsOffset] = useState<any[]>([]);
+  const [dataCarsVisual, setDataCarsVisual] = useState<any[]>([]);
+  const [dataCarsMerch, setDataCarsMerch] = useState<any[]>([]);
+  const [dataCarsUtility, setDataCarsUtility] = useState<any[]>([]);
   const dt = useRef<any>(null);
-  const [dataCarsCantOt, setDataCarsCantOt] = useState<dataCars[]>([]);
-  const [dataComisiones, setDataComisiones] = useState<dataCars[]>([]);
-  const [dataBonificacion, setDataBonificacion] = useState<dataCars[]>([]);
-  const [venTotales,setVenTotales] = useState<dataVentTotal[]>([]);
+  const [dataCarsCantOt, setDataCarsCantOt] = useState<any>(0);
+  const [dataComisiones, setDataComisiones] = useState<any>(0);
+  const [dataBonificacion, setDataBonificacion] = useState<any>(0);
   const [venTotalesCliente,setVenTotalesCliente] = useState<any[]>([]);
+  let [tot,setTot] = useState<number[]>([]);
+  let [ven,setVen] = useState<string[]>([]);
+
+  const chartRef = useRef<HTMLDivElement>(null);
+  const chartInstance = useRef<ApexCharts | null>(null);
 
   const cols = [
     { field: 'Cliruc', header: 'Ruc' },
@@ -56,61 +56,150 @@ const DashboardWithChart = () => {
 ];
 const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field }));
 
+useEffect(() => {
+  // Cargar todos los datos en un solo useEffect
+  const fetchData = async () => {
+    try {
+      const totalVentas: any[] = await VentasServices.getDataTotalVentasxVendedor() || [];
+      const formattedTot: number[] = totalVentas?.map((item: any) => {
+        const parsedValue = parseFloat(item.total);
+        return isNaN(parsedValue) ? 0 : parsedValue;
+      });
+      const formattedVen : string[] = totalVentas?.map((item: any) => {
+        const parsedValue = item.split_part;
+       return  parsedValue;
+      });
+    
+      
 
 
-  useEffect(()  => {
-    VentasServices.getVentasData().then((data:any) => { setDataCars(data[0].VVCliente)});
-    VentasServices.getVentasDataOffset().then((data:any) => { setDataCarsOffset(data[0].VVCliente)});
-    VentasServices.getVentasDataVisual().then((data:any) => { setDataCarsVisual(data[0].VVCliente)});
-    VentasServices.getVentasDataMerch().then((data:any) => { setDataCarsMerch(data[0].VVCliente)});
-   // ProductService.getProductsMini().then((data:any) => setProducts(data));
-    VentasServices.getUtilidadTotal().then((data:any) => { setDataCarsUtility(data[0].VVUtilidad)}); 
-    VentasServices.getCantOt().then((data:any) => { setDataCarsCantOt(data[0].count)});
-    VentasServices.getDataComisiones().then((data:any) => { setDataComisiones(data[0].COMISUM)});
-    VentasServices.getDataBonificacion().then((data:any) => { setDataBonificacion(data[0].Bonificación)});
-    VentasServices.getDataTotalVentasxVendedor().then((data:any) => {setVenTotales(data)});
-    VentasServices.getDataTotalVentasxCliente().then((data:any) => {setVenTotalesCliente(data)});
+      setTot(formattedTot);
+      setVen(formattedVen);
+      console.log(ven);
 
-    const dataBar = {
-      labels: venTotales.map((ven:any) => (ven.split_part)),
-      datasets: [
+      // Cargar los otros datos
+      const ventasData:any[] = await VentasServices.getVentasData() || [];
+      setDataCars(ventasData[0].VVCliente || []);
+      
+      const ventasDataOffset:any[] = await VentasServices.getVentasDataOffset() || [];
+      setDataCarsOffset(ventasDataOffset[0].VVCliente);
+      
+      const ventasDataVisual:any[] = await VentasServices.getVentasDataVisual() || [];
+      setDataCarsVisual(ventasDataVisual[0].VVCliente);
+      
+      const ventasDataMerch:any[] = await VentasServices.getVentasDataMerch() || [];
+      setDataCarsMerch(ventasDataMerch[0].VVCliente);
+      
+      const utilidadTotal:any[] = await VentasServices.getUtilidadTotal() || [];
+      setDataCarsUtility(utilidadTotal[0].VVUtilidad);
+      
+      const cantOt:any = await VentasServices.getCantOt();
+      setDataCarsCantOt(cantOt[0].count);
+      
+      const dataComisiones : any = await VentasServices.getDataComisiones() || [];
+      setDataComisiones(dataComisiones[0].COMISUM);
+      
+      const dataBonificacion: any = await VentasServices.getDataBonificacion() || [];
+      setDataBonificacion(dataBonificacion[0].Bonificación);
+      
+      const venTotalesCliente :any = await VentasServices.getDataTotalVentasxCliente();
+      setVenTotalesCliente(venTotalesCliente);
+      
+      // Aquí se deben construir las opciones del gráfico
+      const colors = ['#FF5733', '#33FF57', '#3357FF', '#F39C12', '#9B59B6', '#1ABC9C', '#E74C3C', '#2C3E50'];
+
+      const options:any = {
+        series: [
           {
-              label: 'Ventas',
-              data: venTotales.map((ven:dataVentTotal) =>  String(Number(ven.total) /100)),
-              backgroundColor: [
-                  'rgba(255, 159, 64, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(153, 102, 255, 0.2)'
-                ],
-                borderColor: [
-                  'rgb(255, 159, 64)',
-                  'rgb(75, 192, 192)',
-                  'rgb(54, 162, 235)',
-                  'rgb(153, 102, 255)'
-                ],
-                borderWidth: 1
+            name: 'Ventas',
+            data: formattedTot,
           }
-      ]
-  };
-  const optionsBar = {
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value:any) {
-              return value.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); // Formato con separadores de miles y dos decimales
+        ],
+        chart: {
+          height: 350,
+          type: 'bar',
+        },
+        colors: colors,
+        plotOptions: {
+          bar: {
+            columnWidth: '45%',
+            distributed: true,
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        legend: {
+          show: false,
+        },
+        title: {
+          text: 'Ranking de Ventas', // Aquí defines el texto del título
+          align: 'center', // Posición del título: puede ser 'left', 'center' o 'right'
+          style: {
+            fontSize: '16px', // Tamaño de la fuente
+            fontWeight: 'bold', // Peso de la fuente
+            color: '#263238' // Color del título
+          }
+        },
+        xaxis: {
+          categories: formattedVen,
+          labels: {
+            style: {
+              colors: colors,
+              fontSize: '12px'
             }
           }
         },
+        yaxis: {
+          labels: {
+            formatter: function (value: any) {
+              return `S/. ${value.toLocaleString('es-PE', {
+                useGrouping: true, 
+                minimumFractionDigits: 2, // Dos decimales
+                maximumFractionDigits: 2
+              })}`;// Formato para mostrar dos decimales
+            }
+          }
+        }
+
+      };
+
+      if (formattedTot.length > 0) {
+
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
+        }
+        chartInstance.current = new ApexCharts(document.querySelector("#chart"), options);
+        chartInstance.current.render();
       }
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
+    }
+
+      
+  
+      // Cleanup function to destroy chart on component unmount
+     
+      
+      
   };
 
-        setChartDataBar(dataBar);
-        setChartOptions(optionsBar);
-  },[])
 
 
+  fetchData();
+
+  return () => {
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+      chartInstance.current = null;
+    }
+  };
+
+  
+}, []);
+
+      
+    console.log("dato:", tot);
 
 const exportPdf = () => {
   const doc: any = new jsPDF(); // Usar 'any' para desactivar la verificación de tipo
@@ -316,12 +405,12 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
           </Grid>
         </Grid>
       </Box>
-      <div style={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0px 50px 0px', height: '480px' }}>
-  <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-    <Chart type="bar" data={chartDataBar} options={chartOptionsBar} style={{ width: '90%', height: '90%',fontSize:'1px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', margin: '80px 0px 0px 0px',height:'100%' }}>
+  <div  style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+  <div id="chart" ref={chartRef} style={{ width: '100%', height: '100%',fontSize:'1px' }} />
   </div>
-  <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-  <div className="card" style={{height:'100%'}}>
+  <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+  <div className="card" style={{height:'100%',width:'100%',marginBottom:'20px'}}>
             <Tooltip target=".export-buttons>button" position="bottom"  />
 
             <DataTable ref={dt} value={venTotalesCliente} header={header} tableStyle={{ minWidth: '50rem' }}>

@@ -59,11 +59,12 @@ export const VentasServices =  {
     return data;
    },
    async getDataTotalVentasxVendedor(){
-    const { data, error } = await supabase.from("vistatotalventas").select("*");
-    if (error) {
-      console.log(error);
+    const response = await supabase.from("vistatotalventas").select("*");
+    if (response.error) {
+      console.log(response.error);
     }
-    return data;
+
+    return response.data;
    },
    async getDataTotalVentasxCliente(){
     const { data, error } = await supabase.from("Clientes").select("*");
