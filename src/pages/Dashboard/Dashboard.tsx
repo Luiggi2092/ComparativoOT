@@ -31,6 +31,7 @@ const DashboardWithChart = () => {
   // }
 
 
+//  interface dataVentTotal { Vendes:string,total:string}
 
   const [dataCars, setDataCars] = useState<any[]>([]);
   const [dataCarsOffset, setDataCarsOffset] = useState<any[]>([]);
@@ -410,15 +411,15 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
   <div id="chart" ref={chartRef} style={{ width: '100%', height: '100%',fontSize:'1px' }} />
   </div>
   <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-  <div className="card" style={{height:'100%',width:'100%',marginBottom:'20px'}}>
+   <div style={{height:'80%',width:'100%',top:'20px'}}>
             <Tooltip target=".export-buttons>button" position="bottom"  />
 
-            <DataTable ref={dt} value={venTotalesCliente} header={header} tableStyle={{ minWidth: '50rem' }}>
+            <DataTable ref={dt} value={venTotalesCliente} header={header} tableStyle={{ minWidth: '50rem' }} style={{top:'-20px',margin:'20px'}}>
                 {cols.map((col, index) => (
                     <Column key={index} field={col.field} header={col.header} />
                 ))}
             </DataTable>
-        </div>
+        </div> 
   </div>
 </div>
 
