@@ -44,6 +44,9 @@ const Header:React.FC = () => {
               <Link to="/usuarios" onClick={toggleDropdown}><i className="pi pi-user" style={{ color: 'slateblue',margin:'0 0.5em' }}></i>Usuarios</Link>
               </li>}
               <li>
+              <Link to="/dash" onClick={toggleDropdown}><i className="pi pi-bullseye" style={{ color: 'slateblue',margin:'0 0.5em' }}></i>Dashboard</Link>
+              </li>
+              <li>
               <Link to="/"><i className="pi pi-sign-in" style={{ color: 'slateblue',margin:'0 0.5em' }}></i>Salir</Link>
               </li>
                 

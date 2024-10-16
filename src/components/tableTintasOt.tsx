@@ -57,6 +57,7 @@ export const TinOtTable : React.FC<OtDataTintable> = ({tinot,onChangeCantidad,on
 
                 )}
                 </tbody>
+                
         </table>
     )
 

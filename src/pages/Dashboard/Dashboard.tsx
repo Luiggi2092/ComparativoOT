@@ -3,9 +3,12 @@ import { Box, Grid, Paper, Typography, IconButton } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CategoryIcon from '@mui/icons-material/Category';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
+import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import {useState,useEffect,useRef} from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import GradingIcon from '@mui/icons-material/Grading';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import { Button } from 'primereact/button';
 import ApexCharts from 'apexcharts'
 import { Tooltip } from 'primereact/tooltip';
@@ -52,7 +55,7 @@ const DashboardWithChart = () => {
   const cols = [
     { field: 'Cliruc', header: 'Ruc' },
     { field: 'Clides', header: 'Cliente' },
-    { field: 'TotalVentas', header: 'Total Ventas' },
+    { field: 'TotalVenta', header: 'Total Venta' },
     { field: 'Total Utilidad', header: 'Total Utilidad' }
 ];
 const exportColumns = cols.map((col) => ({ title: col.header, dataKey: col.field }));
@@ -205,11 +208,11 @@ useEffect(() => {
 const exportPdf = () => {
   const doc: any = new jsPDF(); // Usar 'any' para desactivar la verificación de tipo
   
-  const tableData = venTotalesCliente.map((user, index) => [
-    (index + 1).toString(),
+  const tableData = venTotalesCliente.map((user) => [
+    //(index + 1).toString(),
     user.Cliruc, // Solo se usa para recuperar la imagen en didDrawCell, no se muestra en la tabla
     user.Clides,
-    user.TotalVentas,
+    user.TotalVenta,
     user['Total Utilidad']
 ]);
 
@@ -343,7 +346,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
               <Grid container alignItems="center">
                 <Grid item xs={3}>
                   <IconButton sx={{ color: '#fff' }}>
-                    <MonetizationOnIcon sx={{ fontSize: 40 }} />
+                    <LocalAtmIcon sx={{ fontSize: 40 }}/>
                   </IconButton>
                 </Grid>
                 <Grid item xs={9}>
@@ -360,7 +363,8 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
               <Grid container alignItems="center">
                 <Grid item xs={3}>
                   <IconButton sx={{ color: '#fff' }}>
-                    <ShoppingCartIcon sx={{ fontSize: 40 }} />
+                   
+                    <GradingIcon sx={{ fontSize: 40 }} />
                   </IconButton>
                 </Grid>
                 <Grid item xs={9}>
@@ -394,7 +398,7 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
               <Grid container alignItems="center">
                 <Grid item xs={3}>
                   <IconButton sx={{ color: '#fff' }}>
-                    <CategoryIcon sx={{ fontSize: 40 }} />
+                    <MilitaryTechIcon sx={{ fontSize: 40 }}/>
                   </IconButton>
                 </Grid>
                 <Grid item xs={9}>
@@ -411,10 +415,10 @@ const saveAsExcelFile = (buffer:any, fileName:any) => {
   <div id="chart" ref={chartRef} style={{ width: '100%', height: '100%',fontSize:'1px' }} />
   </div>
   <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-   <div style={{height:'80%',width:'100%',top:'20px'}}>
+   <div style={{height:'80%',width:'100%'}}>
             <Tooltip target=".export-buttons>button" position="bottom"  />
 
-            <DataTable ref={dt} value={venTotalesCliente} header={header} tableStyle={{ minWidth: '50rem' }} style={{top:'-20px',margin:'20px'}}>
+            <DataTable ref={dt} value={venTotalesCliente} header={header} tableStyle={{ minWidth: '50rem' }} style={{top:'-100px',margin:'20px'}}>
                 {cols.map((col, index) => (
                     <Column key={index} field={col.field} header={col.header} />
                 ))}

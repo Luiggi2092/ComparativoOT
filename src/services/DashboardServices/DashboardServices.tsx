@@ -67,7 +67,7 @@ export const VentasServices =  {
     return response.data;
    },
    async getDataTotalVentasxCliente(){
-    const { data, error } = await supabase.from("Clientes").select("*");
+    const { data, error } = await supabase.from("vw_clientesventasutil").select("*");
     if (error) {
       console.log(error);
     }

@@ -97,6 +97,33 @@ export const PlanOtTableReal : React.FC<PlanDataOtReal> = ({planot,listado}) => 
                 
                 }
               </tbody>
+              <tfoot>
+            <tr
+             style={{
+                backgroundColor: (() => {
+                  const subtotalPre = planot.reduce((a, b) => a + b.SubtotalPre, 0);
+                  const subtotalReal = planot.reduce((a, b) => a + b.SubtotalReal, 0);
+            
+                  if (subtotalReal > subtotalPre) {
+                    return 'red'; // Si el real es mayor al presupuestado, color verde
+                  } else if (subtotalReal !== subtotalPre) {
+                    return 'red'; // Si son diferentes, color rojo
+                  } else {
+                    return 'white'; // Si son iguales, color blanco o default
+                  }
+                })()
+              }} 
+            ><td style={{textAlign: 'center'}}>Placas S/.</td> <td> </td><td> </td><td> </td><td> </td>
+            <td style={{textAlign: 'center'}}>
+                {planot.reduce((a,b) => a+b.SubtotalPre,0).toFixed(2)}
+                </td>
+                <td> </td><td> </td>
+                <td style={{textAlign: 'center'}}>
+                {planot.reduce((a,b) => a+b.SubtotalReal,0).toFixed(2)}   
+                </td>
+                </tr>
+           </tfoot>
+         
         </table>
         </>
     )

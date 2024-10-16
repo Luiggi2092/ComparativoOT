@@ -95,7 +95,33 @@ export const AcaOtTableReal : React.FC<OtDataAca> = ({acaot,listado}) => {
                 </tr>
             ))}
         </tbody>
-
+        <tfoot>
+            <tr
+             style={{
+                backgroundColor: (() => {
+                  const subtotalPre = acaot.reduce((a, b) => a + b.SubtotalPre, 0);
+                  const subtotalReal = acaot.reduce((a, b) => a + b.SubtotalReal, 0);
+            
+                  if (subtotalReal > subtotalPre) {
+                    return 'red'; // Si el real es mayor al presupuestado, color verde
+                  } else if (subtotalReal !== subtotalPre) {
+                    return 'red'; // Si son diferentes, color rojo
+                  } else {
+                    return 'white'; // Si son iguales, color blanco o default
+                  }
+                })()
+              }} 
+            ><td style={{textAlign: 'center'}}>Acabados Externos S/.</td> <td> </td><td> </td><td> </td><td> </td>
+            <td style={{textAlign: 'center'}}>
+                {acaot.reduce((a,b) => a+b.SubtotalPre,0).toFixed(2)}
+                </td>
+                <td> </td><td> </td>
+                <td style={{textAlign: 'center'}}>
+                {acaot.reduce((a,b) => a+b.SubtotalReal,0).toFixed(2)}   
+                </td>
+                </tr>
+           </tfoot>
+       
         </table>
         </>
     )
