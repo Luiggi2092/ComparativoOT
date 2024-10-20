@@ -111,7 +111,7 @@ export const AcaOtTableReal : React.FC<OtDataAca> = ({acaot,listado}) => {
                   }
                 })()
               }} 
-            ><td style={{textAlign: 'center'}}>Acabados Externos S/.</td> <td> </td><td> </td><td> </td><td> </td>
+            ><td style={{textAlign: 'center'}}>Acabados Externos S/.</td> <td></td><td></td><td> </td><td> </td><td> </td>
             <td style={{textAlign: 'center'}}>
                 {acaot.reduce((a,b) => a+b.SubtotalPre,0).toFixed(2)}
                 </td>

@@ -24,11 +24,11 @@ const Header:React.FC = () => {
         <nav style={{display:'flex',justifyContent:'space-between',alignContent:'center',padding: '8px 20px'}}>
             <ul style={{display:'flex',listStyle:'none',margin:0,padding:0,gap:'15px'}}>
                 <li style={{listStyle:'none'}}  >
-                    <Link to="/pre" style={{color:'white'}}><i className="pi pi-receipt" style={{ color: 'white',margin:'0 0.5em' }}></i>Presupuestado</Link>
+                    <Link to="/pre"  style={{color:'white'}}><i className="pi pi-receipt" style={{ color: 'white',margin:'0 0.5em' }}></i>Presupuestado</Link>
                     
                 </li>
                 <li style={{listStyle:'none',position:'relative'}}>
-                    <Link to="/real" style={{color:'white'}}><i className="pi pi-money-bill" style={{ color: 'green',margin:'0 0.5em' }}></i>Presupuestado vs Real</Link>
+                    <Link to="/real"  style={{color:'white'}}><i className="pi pi-money-bill" style={{ color: 'green',margin:'0 0.5em' }}></i>Presupuestado vs Real</Link>
                 </li>
                 <li style={{listStyle:'none',position:'relative'}}>
                 <Link to={'#'} style={{color:'white',background:'none',border:'none',fontSize:16,cursor:'pointer',position:'relative'}} onClick={toggleDropdown}>

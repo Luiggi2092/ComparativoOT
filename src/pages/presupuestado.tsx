@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { OtData } from '../components/tableMatOt';
 import { MatOtTable } from '../components/tableMatOt';
 import { PlanOtTable } from '../components/tablePlanOt';
@@ -11,11 +11,15 @@ import { AcaProPOt } from '../components/tableAcaProOt';
 import { AcaPropOtTable } from '../components/tableAcaProOt';
 import { BarOt } from '../components/tableBarnizOt';
 import { BarOtTable } from '../components/tableBarnizOt';
+import { TreeSelect } from 'primereact/treeselect';
 import { Toaster, toast } from 'sonner';
 import { AudioProps,Audio } from 'react-loader-spinner'
 import {supabase} from '../services/fetch'
 import {useUserStore} from '../store/UserStore'
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import {PresupuestadoServices} from '../services/PresupuestadoServices/PresupuestadoService';
+import { InputNumber } from 'primereact/inputnumber';
 
 
 interface FormattedDataItem {
@@ -29,6 +33,11 @@ interface FormattedDataItem {
     ImaSer: string;
   }
 
+
+  interface Service {
+    key: string;
+    label: string;
+  }
 
 
 
@@ -45,8 +54,30 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const [moneda,setMoneda] = useState<string>('');
     const [loading,setLoading] = useState<boolean>(false);
     const [dataAcaProp,setdataAcaProp] = useState<AcaProPOt[]>([]);
+    const [ServiceDialog, setServiceDialog] = useState(false);
+    const [nodes, setNodes] = useState<Service[]>([]);
+    const [selectedNodeKey, setSelectedNodeKey] = useState<string | null>(null);
+    const [value2] = useState(0.00);
     const {User} = useUserStore();
 
+
+    useEffect(() => {
+      const fetchServices = async () => {
+        try {
+          const data = await PresupuestadoServices.getServices();
+          const formattedNodes = data?.map((item: any) => ({
+            key: item.id.toString(),
+            label: item.Amades.trim()
+          })) || [];
+          setNodes(formattedNodes);
+        } catch (error) {
+          console.error('Error fetching services:', error);
+          // Handle error (e.g., show an error message to the user)
+        }
+      };
+  
+      fetchServices();
+    }, []);
 
 
 
@@ -148,6 +179,29 @@ const Presupuestado : React.FC<AudioProps> = () => {
       prevData.map((item,index) => (index === id ? { ...item, Cantidad: newCantidad } : item))
     );
   };
+
+
+  const hideDialog = () => {
+    
+    setServiceDialog(false);
+};
+
+
+const openNew = () => {
+  setServiceDialog(true);
+};
+
+const saveService = async() => {
+
+
+}
+
+  const productDialogFooter = (
+    <React.Fragment>
+        <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
+        <Button label="Save" icon="pi pi-check" onClick={saveService} />
+    </React.Fragment>
+);
 
    
 
@@ -388,12 +442,38 @@ const handleSubmit = async() => {
     {/* // <img src={Logo} style={{display:'flex',position:'absolute',marginTop:'-5px',height:'100px'}}/> */}
     <div style={{padding: '2rem'}}>
     <div style={{display:'flex',justifyContent:'space-between',gap:20}}>
-   
-   <div style={{zIndex:'10'}}> 
+    <Button  label="Servicio" style={{position:'absolute'}} icon="pi pi-plus" severity="success" loading={loading} onClick={openNew} />
+   <div style={{zIndex:'10',marginLeft:'25%',marginTop:'-15px'}}>
+    <div>
     { op && <h2> Orden : {op} - PRODUCTO : {producto}</h2>} 
     { op && <span>Moneda: {moneda}</span>}
     {op &&  <h4>Precios sin IGV</h4>}
     </div>
+    </div>
+    <Dialog visible={ServiceDialog} style={{ width: '33rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Nuevo Servicio" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+    <div className="field" >
+    <label htmlFor="name" className="font-bold">
+                        Servicio :
+    </label>
+         <TreeSelect value={selectedNodeKey} onChange={(e:any) => setSelectedNodeKey(e.value)} options={nodes} 
+                filter className="md:w-60rem w-full" placeholder="Select Item"></TreeSelect>    </div>
+    <div className="field">
+    <label htmlFor="name" className="font-bold">
+                        Cantidad :    
+    </label>
+    <br/>
+    <InputNumber   minFractionDigits={2} />
+    </div>   
+    <div className="field">
+    <label htmlFor="name" className="font-bold">
+                        Costo :
+    </label>
+    <br/>
+    <InputNumber inputId="horizontal-buttons" value={value2} /*onValueChange={(e) => setValue2(e.value)}*/ showButtons buttonLayout="horizontal" step={0.1}
+                    decrementButtonClassName="p-button-danger" incrementButtonClassName="p-button-success" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                    mode="currency" currency="PEN" />
+    </div>            
+    </Dialog>
     <div style={{display:'flex',gap:'15px',justifyContent:'flex-end'}}>
     <input placeholder='Ingrese OT' onChange={handleInputChange} style={{height:'3rem'}} />
     <div style={{height:'3rem'}}>
