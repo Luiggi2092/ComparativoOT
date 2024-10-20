@@ -22,6 +22,7 @@ import {PresupuestadoServices} from '../services/PresupuestadoServices/Presupues
 import { InputNumber } from 'primereact/inputnumber';
 
 
+
 interface FormattedDataItem {
     ImaPro: number;
     ImaDes1: string;
@@ -450,7 +451,7 @@ const handleSubmit = async() => {
     {op &&  <h4>Precios sin IGV</h4>}
     </div>
     </div>
-    <Dialog visible={ServiceDialog} style={{ width: '33rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Nuevo Servicio" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+    <Dialog visible={ServiceDialog} style={{ width: '33rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header={<div style={{display:'flex'}}><img src="https://img.icons8.com/color/48/service.png"/><div>Nuevo Servicio</div></div>} modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
     <div className="field" >
     <label htmlFor="name" className="font-bold">
                         Servicio :
