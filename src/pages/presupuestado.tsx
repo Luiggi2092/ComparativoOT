@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { OtData } from '../components/tableMatOt';
 import { MatOtTable } from '../components/tableMatOt';
 import { PlanOtTable } from '../components/tablePlanOt';
@@ -20,6 +20,8 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import {PresupuestadoServices} from '../services/PresupuestadoServices/PresupuestadoService';
 import { InputNumber } from 'primereact/inputnumber';
+import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
 
 
 
@@ -34,11 +36,36 @@ interface FormattedDataItem {
     ImaSer: string;
   }
 
+  interface FormattedDataItemService {
+    ImaPro: number;
+    ImaDes1: string;
+    ImaSel: string;
+    Imatra: string;
+    Imapro1:string;
+    ImaCan: number;
+    ImaPun: number;
+    ImaSer: string;
+    ImaFac: string;
+  }
+
 
   interface Service {
     key: string;
     label: string;
   }
+
+  let emptyService:FormattedDataItemService = {
+    ImaPro: 0,
+    ImaDes1: '',
+    ImaSel: 'S',
+    Imatra: 'SERVICIO',
+    Imapro1: 'DET',
+    ImaCan: 0,
+    ImaPun: 0,
+    ImaSer: '',
+    ImaFac: ' ',
+  };
+
 
 
 
@@ -57,9 +84,9 @@ const Presupuestado : React.FC<AudioProps> = () => {
     const [dataAcaProp,setdataAcaProp] = useState<AcaProPOt[]>([]);
     const [ServiceDialog, setServiceDialog] = useState(false);
     const [nodes, setNodes] = useState<Service[]>([]);
-    const [selectedNodeKey, setSelectedNodeKey] = useState<string | null>(null);
-    const [value2] = useState(0.00);
     const {User} = useUserStore();
+    const [Form,setForm] = useState(emptyService);
+    const toaster = useRef<any>(null);
 
 
     useEffect(() => {
@@ -81,8 +108,6 @@ const Presupuestado : React.FC<AudioProps> = () => {
     }, []);
 
 
-
-    //console.log(User[0].image);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>)=> {
 
@@ -185,7 +210,11 @@ const Presupuestado : React.FC<AudioProps> = () => {
   const hideDialog = () => {
     
     setServiceDialog(false);
-};
+  };
+
+  const showError = () => {
+    toaster.current.show({severity:'error', summary: 'Orden No existe', detail:'Ingrese una Orden valida', life: 3000});
+   }
 
 
 const openNew = () => {
@@ -193,9 +222,34 @@ const openNew = () => {
 };
 
 const saveService = async() => {
+      
+     setForm({...Form,ImaSer:String(Ot)})
 
 
-}
+     const response2 = await supabase.from('ItMovimientos').select().eq('ImaSer', Ot);
+
+       if(response2.data && response2?.data.length > 0){
+        const response =  await supabase.from("ItMovimientos").insert(Form);
+        
+        if(response.status === 201){
+          console.log(response.data);
+          toaster.current.show({severity:'success', summary: 'Servicio agregado', detail:'Servicio agregado correctamente', life: 3000});
+          setServiceDialog(false);
+          setForm(emptyService);
+         }
+      }else{
+        toaster.current.show({severity:'error', summary: 'Orden Sin Ingreso Real', detail:'Ingrese Costos Real OT', life: 3000});
+      }
+       
+     
+       
+    
+
+     }
+     
+
+
+
 
   const productDialogFooter = (
     <React.Fragment>
@@ -222,6 +276,7 @@ const saveService = async() => {
             setDataAca([]);
             setdataAcaProp([]);
             setMoneda('');
+            setLoading(false);
             return;
        }
    
@@ -233,7 +288,16 @@ const saveService = async() => {
        const responseAca = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'Actcod' });
        const responseAcaProp = await  supabase.from('OrdTCosto').select().match({ OdtCod: Ot, Tipo: 'Amacod' });
        const responseOt = await supabase.from('Ordt').select().match({OdtCod: Ot});
-       console.log(responseOt);
+       
+       
+       if(responseOt.data && responseOt?.data.length === 0){
+        setLoading(false);
+        setProducto('');
+        setOp('');
+        setMoneda('');
+        showError();  
+
+       }
 
        if(!responseMat.data){
          throw new Error('Error al buscar la Orden');
@@ -440,10 +504,11 @@ const handleSubmit = async() => {
    return (
     <>
     <Toaster richColors/>
+    <Toast ref={toaster} />
     {/* // <img src={Logo} style={{display:'flex',position:'absolute',marginTop:'-5px',height:'100px'}}/> */}
     <div style={{padding: '2rem'}}>
     <div style={{display:'flex',justifyContent:'space-between',gap:20}}>
-    <Button  label="Servicio" style={{position:'absolute'}} icon="pi pi-plus" severity="success" loading={loading} onClick={openNew} />
+   {producto && <Button  label="Servicio" style={{position:'absolute'}} icon="pi pi-plus" severity="success" loading={loading} onClick={openNew} />}
    <div style={{zIndex:'10',marginLeft:'25%',marginTop:'-15px'}}>
     <div>
     { op && <h2> Orden : {op} - PRODUCTO : {producto}</h2>} 
@@ -456,24 +521,31 @@ const handleSubmit = async() => {
     <label htmlFor="name" className="font-bold">
                         Servicio :
     </label>
-         <TreeSelect value={selectedNodeKey} onChange={(e:any) => setSelectedNodeKey(e.value)} options={nodes} 
+         <TreeSelect name="ImaDes1" value={Form.ImaDes1} onChange={(e:any) => setForm({...Form,ImaDes1:e.value})} options={nodes} 
                 filter className="md:w-60rem w-full" placeholder="Select Item"></TreeSelect>    </div>
     <div className="field">
     <label htmlFor="name" className="font-bold">
                         Cantidad :    
     </label>
     <br/>
-    <InputNumber   minFractionDigits={2} />
+    <InputNumber name='ImaCan' value={Form.ImaCan} onChange={(e:any)=> setForm({...Form,ImaCan:e.value})}   minFractionDigits={2} />
     </div>   
     <div className="field">
     <label htmlFor="name" className="font-bold">
                         Costo :
     </label>
     <br/>
-    <InputNumber inputId="horizontal-buttons" value={value2} /*onValueChange={(e) => setValue2(e.value)}*/ showButtons buttonLayout="horizontal" step={0.1}
+    <InputNumber inputId="horizontal-buttons" value={Form.ImaPun} onChange={(e:any)=> setForm({...Form,ImaPun:e.value})} name='ImaPun'minFractionDigits={4} showButtons buttonLayout="horizontal" step={0.1} 
                     decrementButtonClassName="p-button-danger" incrementButtonClassName="p-button-success" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                     mode="currency" currency="PEN" />
-    </div>            
+    </div>  
+    <div className="field">
+    <label htmlFor="name" className="font-bold">
+                        N° Factura :
+    </label> 
+    <InputText name='ImaFac' value={Form.ImaFac !== undefined ? Form.ImaFac : ''} onChange={(e:any)=> setForm({...Form,ImaFac:e.target.value})} />
+    </div>
+
     </Dialog>
     <div style={{display:'flex',gap:'15px',justifyContent:'flex-end'}}>
     <input placeholder='Ingrese OT' onChange={handleInputChange} style={{height:'3rem'}} />

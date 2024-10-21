@@ -7,6 +7,7 @@ import { BarOtTableReal } from '../components/tableBarnizOtReal';
 import { AcaOtTableReal } from '../components/tableAcaOtReal';
 import { AcaProOtReal } from '../components/tableAcaProRealOt';
 import { AcaProOtTableReal } from '../components/tableAcaProRealOt';
+import { OtRealSerTable } from '../components/tableSerRealOt';
 import { Toaster, toast } from 'sonner';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -26,7 +27,7 @@ const Real : React.FC<AudioProps> = ({}) =>{
     const [dataBar,setDataBar] = useState<OtReal[]>([]);
     const [dataAca,setDataAca] = useState<OtReal[]>([]);
     const [dataAcaProp,setDataAcaProp] = useState<AcaProOtReal[]>([]);
-    //const [dataSer,setDataSer] = useState<OtDataSer[]>([]);
+    const [dataSer,setDataSer] = useState<any[]>([]);
     const [Ot,setOt] = useState<number>(0);
     const [producto,setProducto] = useState<string>('');
     const [op,setOp] = useState<string>('');
@@ -82,8 +83,10 @@ const Real : React.FC<AudioProps> = ({}) =>{
        let responseBar = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'BARNIZ'})
        let responseEx = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'Actcod'})
        let responsePro = await supabase.rpc('get_itmovcost', { p_ot: Ot, p_tip: 'Amacod'})
+       let responseSer = await supabase.rpc('get_itmovcostser', { p_ot: Ot, p_tip: 'SERVICIO'})
        const responseOt = await supabase.from('Ordt').select().match({OdtCod: Ot});
        
+       console.log(responseSer);
        
 
        if(!responseOt.data){
@@ -103,10 +106,10 @@ const Real : React.FC<AudioProps> = ({}) =>{
             setDataPlan(responsePlan.data);
             setDataTin(responseTin.data);
             setDataAca(responseEx.data);  
-            setDataBar(responseBar.data);/*
-            setDataSer(userData.Servicios);*/
-            setDataAcaProp(responsePro.data);/*
-            */
+            setDataBar(responseBar.data);
+            setDataSer(responseSer.data);
+            setDataAcaProp(responsePro.data);
+            
             setProducto(responseOt.data[0].OdtDescrip);
             setOp(responseOt.data[0].OdtCod)
             setMoneda(responseOt.data[0].OdtMon);
@@ -238,7 +241,7 @@ const Real : React.FC<AudioProps> = ({}) =>{
     {User[0].chkpreAcaEx && <h1>Acabados Manuales Externos</h1>}
     {User[0].chkpreAcaEx && <AcaOtTableReal acaot={dataAca} listado={handleSearch} />}
      <h1>Servicios</h1>
-     {/* <OtRealSerTable otSer={''} listado={handleSearch} /> */}
+    <OtRealSerTable otSer={dataSer} listado={handleSearch} /> 
     </div>
     </>
     )

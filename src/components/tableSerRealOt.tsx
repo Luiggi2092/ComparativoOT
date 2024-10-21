@@ -1,15 +1,17 @@
 import './tablestyle.css';
 import ModalServicio from './ModalServicio';
 import { useState } from 'react';
+import { Button } from 'primereact/button';
+
 
 export interface OtDataSer {
-    Orden:string,
+    id:string,
     SERVICIO:string,
     Elemento:string,
     FACTURA:string,
-    CANTPRE: number,
-    COSTOUNPRE: number,
-    SubTotalPRE: number,
+    Cantidad: number,
+    PrecioUni: number,
+    SubtotalPre: number,
     CANTREAL:number,
     COSTOUNDREAL:number,
     SubtotalReal:number,
@@ -28,6 +30,8 @@ export const OtRealSerTable : React.FC<otDataRealTableSer> = ({otSer,listado}) =
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [codigo,setCodigo] = useState('');
     
+
+    console.log(otSer);
 
     const handleOpenModal = (cod:string) => {
         setIsModalOpen(true);
@@ -55,9 +59,6 @@ export const OtRealSerTable : React.FC<otDataRealTableSer> = ({otSer,listado}) =
                     Servicio
                 </th>
                 <th style={{backgroundColor:'blue',color:"white",textAlign: 'center',width:'10%'}}>
-                    Elemento
-                </th>
-                <th style={{backgroundColor:'blue',color:"white",textAlign: 'center',width:'10%'}}>
                     N° Factura
                 </th>
                 <th style={{backgroundColor:'gray',color:"white",textAlign: 'center'}}>
@@ -79,7 +80,7 @@ export const OtRealSerTable : React.FC<otDataRealTableSer> = ({otSer,listado}) =
                     Subtotal.Real
                 </th>
                 <th style={{backgroundColor:'blue',color:"white",textAlign: 'center',width:'10%'}}>
-                    FACTURA
+                    Acción
                 </th>
                 </tr>
                
@@ -88,25 +89,22 @@ export const OtRealSerTable : React.FC<otDataRealTableSer> = ({otSer,listado}) =
                 {otSer.map((ser,index) => (
                     <tr key={index}>
                         <td style={{width:'10%',textAlign: 'center'}}>
-                            {ser.Orden}
+                            {ser.id}
                         </td> 
                         <td style={{width:'25%',textAlign: 'center'}}>
                             {ser.SERVICIO}
                         </td>
                         <td style={{width:'10%',textAlign: 'center'}}>
-                            {ser.Elemento}
-                        </td>
-                        <td style={{width:'10%',textAlign: 'center'}}>
                             {ser.FACTURA}
                         </td>
                         <td style={{textAlign: 'center'}}>
-                            {ser.CANTPRE}
+                            {ser.Cantidad}
                         </td>
                         <td style={{textAlign: 'center'}}>
-                            {ser.COSTOUNPRE}
+                            {ser.PrecioUni}
                         </td>
                         <td style={{textAlign: 'center'}}>
-                            {ser.SubTotalPRE}
+                            {ser.SubtotalPre}
                         </td>
                         <td style={{textAlign: 'center'}}>
                             {ser.CANTREAL}
@@ -118,7 +116,8 @@ export const OtRealSerTable : React.FC<otDataRealTableSer> = ({otSer,listado}) =
                             {ser.SubtotalReal}
                         </td>
                         <td style={{textAlign: 'center'}}>
-                         <button onClick={ () => handleOpenModal(ser.Orden)}>Agregar</button>
+                        <Button onClick={ () => handleOpenModal(ser.id)} label='Editar' icon="pi pi-pencil" severity="success" rounded/>
+                     
                          </td>   
                     </tr>
                 ))}
